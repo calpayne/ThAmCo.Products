@@ -19,10 +19,11 @@ namespace ThAmCo.Products.Web.Controllers
         }
 
         // GET: Products
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
             var storeDb = _context.Products.Include(p => p.Brand).Include(p => p.Material).Include(p => p.Type);
-            return View(await storeDb.ToListAsync());
+            return Ok(await storeDb.ToListAsync());
         }
 
         // GET: Products/Details/5
