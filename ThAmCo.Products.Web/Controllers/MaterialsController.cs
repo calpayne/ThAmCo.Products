@@ -2,14 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ThAmCo.Products.Data;
 
 namespace ThAmCo.Products.Web.Controllers
 {
-    public class MaterialsController : Controller
+    [Route("api/[controller]")]
+    [ApiController]
+    public class MaterialsController : ControllerBase
     {
         private readonly StoreDb _context;
 
@@ -18,130 +20,81 @@ namespace ThAmCo.Products.Web.Controllers
             _context = context;
         }
 
-        // GET: Materials
-        public async Task<IActionResult> Index()
+        // GET: api/Materials
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Material>>> GetMaterials()
         {
-            return View(await _context.Materials.ToListAsync());
+            return await _context.Materials.ToListAsync();
         }
 
-        // GET: Materials/Details/5
-        public async Task<IActionResult> Details(int? id)
+        // GET: api/Materials/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Material>> GetMaterial(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var material = await _context.Materials
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (material == null)
-            {
-                return NotFound();
-            }
-
-            return View(material);
-        }
-
-        // GET: Materials/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Materials/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Active")] Material material)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(material);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(material);
-        }
-
-        // GET: Materials/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
             var material = await _context.Materials.FindAsync(id);
+
             if (material == null)
             {
                 return NotFound();
             }
-            return View(material);
+
+            return material;
         }
 
-        // POST: Materials/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Active")] Material material)
+        // PUT: api/Materials/5
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutMaterial(int id, Material material)
         {
             if (id != material.Id)
             {
-                return NotFound();
+                return BadRequest();
             }
 
-            if (ModelState.IsValid)
+            _context.Entry(material).State = EntityState.Modified;
+
+            try
             {
-                try
-                {
-                    _context.Update(material);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!MaterialExists(material.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                await _context.SaveChangesAsync();
             }
-            return View(material);
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!MaterialExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
         }
 
-        // GET: Materials/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        // POST: api/Materials
+        [HttpPost]
+        public async Task<ActionResult<Material>> PostMaterial(Material material)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            _context.Materials.Add(material);
+            await _context.SaveChangesAsync();
 
-            var material = await _context.Materials
-                .FirstOrDefaultAsync(m => m.Id == id);
+            return CreatedAtAction("GetMaterial", new { id = material.Id }, material);
+        }
+
+        // DELETE: api/Materials/5
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<Material>> DeleteMaterial(int id)
+        {
+            var material = await _context.Materials.FindAsync(id);
             if (material == null)
             {
                 return NotFound();
             }
 
-            return View(material);
-        }
-
-        // POST: Materials/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var material = await _context.Materials.FindAsync(id);
             _context.Materials.Remove(material);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+
+            return material;
         }
 
         private bool MaterialExists(int id)

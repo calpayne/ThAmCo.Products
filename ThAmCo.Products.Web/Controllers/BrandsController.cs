@@ -2,14 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ThAmCo.Products.Data;
 
 namespace ThAmCo.Products.Web.Controllers
 {
-    public class BrandsController : Controller
+    [Route("api/[controller]")]
+    [ApiController]
+    public class BrandsController : ControllerBase
     {
         private readonly StoreDb _context;
 
@@ -18,130 +20,81 @@ namespace ThAmCo.Products.Web.Controllers
             _context = context;
         }
 
-        // GET: Brands
-        public async Task<IActionResult> Index()
+        // GET: api/Brands
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Brand>>> GetBrands()
         {
-            return View(await _context.Brands.ToListAsync());
+            return await _context.Brands.ToListAsync();
         }
 
-        // GET: Brands/Details/5
-        public async Task<IActionResult> Details(int? id)
+        // GET: api/Brands/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Brand>> GetBrand(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var brand = await _context.Brands
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (brand == null)
-            {
-                return NotFound();
-            }
-
-            return View(brand);
-        }
-
-        // GET: Brands/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Brands/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Description,Active")] Brand brand)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(brand);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(brand);
-        }
-
-        // GET: Brands/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
             var brand = await _context.Brands.FindAsync(id);
+
             if (brand == null)
             {
                 return NotFound();
             }
-            return View(brand);
+
+            return brand;
         }
 
-        // POST: Brands/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,Active")] Brand brand)
+        // PUT: api/Brands/5
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutBrand(int id, Brand brand)
         {
             if (id != brand.Id)
             {
-                return NotFound();
+                return BadRequest();
             }
 
-            if (ModelState.IsValid)
+            _context.Entry(brand).State = EntityState.Modified;
+
+            try
             {
-                try
-                {
-                    _context.Update(brand);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!BrandExists(brand.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                await _context.SaveChangesAsync();
             }
-            return View(brand);
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!BrandExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
         }
 
-        // GET: Brands/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        // POST: api/Brands
+        [HttpPost]
+        public async Task<ActionResult<Brand>> PostBrand(Brand brand)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            _context.Brands.Add(brand);
+            await _context.SaveChangesAsync();
 
-            var brand = await _context.Brands
-                .FirstOrDefaultAsync(m => m.Id == id);
+            return CreatedAtAction("GetBrand", new { id = brand.Id }, brand);
+        }
+
+        // DELETE: api/Brands/5
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<Brand>> DeleteBrand(int id)
+        {
+            var brand = await _context.Brands.FindAsync(id);
             if (brand == null)
             {
                 return NotFound();
             }
 
-            return View(brand);
-        }
-
-        // POST: Brands/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var brand = await _context.Brands.FindAsync(id);
             _context.Brands.Remove(brand);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+
+            return brand;
         }
 
         private bool BrandExists(int id)

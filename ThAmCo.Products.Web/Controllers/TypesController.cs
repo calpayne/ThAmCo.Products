@@ -2,14 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ThAmCo.Products.Data;
 
 namespace ThAmCo.Products.Web.Controllers
 {
-    public class TypesController : Controller
+    [Route("api/[controller]")]
+    [ApiController]
+    public class TypesController : ControllerBase
     {
         private readonly StoreDb _context;
 
@@ -18,130 +20,81 @@ namespace ThAmCo.Products.Web.Controllers
             _context = context;
         }
 
-        // GET: Types
-        public async Task<IActionResult> Index()
+        // GET: api/Types
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<PType>>> GetTypes()
         {
-            return View(await _context.Types.ToListAsync());
+            return await _context.Types.ToListAsync();
         }
 
-        // GET: Types/Details/5
-        public async Task<IActionResult> Details(int? id)
+        // GET: api/Types/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<PType>> GetPType(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var pType = await _context.Types
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (pType == null)
-            {
-                return NotFound();
-            }
-
-            return View(pType);
-        }
-
-        // GET: Types/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Types/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Description,Active")] PType pType)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(pType);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(pType);
-        }
-
-        // GET: Types/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
             var pType = await _context.Types.FindAsync(id);
+
             if (pType == null)
             {
                 return NotFound();
             }
-            return View(pType);
+
+            return pType;
         }
 
-        // POST: Types/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,Active")] PType pType)
+        // PUT: api/Types/5
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutPType(int id, PType pType)
         {
             if (id != pType.Id)
             {
-                return NotFound();
+                return BadRequest();
             }
 
-            if (ModelState.IsValid)
+            _context.Entry(pType).State = EntityState.Modified;
+
+            try
             {
-                try
-                {
-                    _context.Update(pType);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!PTypeExists(pType.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                await _context.SaveChangesAsync();
             }
-            return View(pType);
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!PTypeExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
         }
 
-        // GET: Types/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        // POST: api/Types
+        [HttpPost]
+        public async Task<ActionResult<PType>> PostPType(PType pType)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            _context.Types.Add(pType);
+            await _context.SaveChangesAsync();
 
-            var pType = await _context.Types
-                .FirstOrDefaultAsync(m => m.Id == id);
+            return CreatedAtAction("GetPType", new { id = pType.Id }, pType);
+        }
+
+        // DELETE: api/Types/5
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<PType>> DeletePType(int id)
+        {
+            var pType = await _context.Types.FindAsync(id);
             if (pType == null)
             {
                 return NotFound();
             }
 
-            return View(pType);
-        }
-
-        // POST: Types/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var pType = await _context.Types.FindAsync(id);
             _context.Types.Remove(pType);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+
+            return pType;
         }
 
         private bool PTypeExists(int id)
