@@ -50,6 +50,13 @@ namespace ThAmCo.Products.Web.Controllers
             return product;
         }
 
+        // GET: api/Products/PriceHistory/{id}
+        [Route("pricehistory/{id}"), HttpGet]
+        public async Task<ActionResult<IEnumerable<PriceHistoryDto>>> GetPriceHistory()
+        {
+            return await _context.PriceHistory.Select(p => PriceHistoryDto.Transform(p)).ToListAsync();
+        }
+
         // PUT: api/Products/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutProduct(int id, ProductDto product)

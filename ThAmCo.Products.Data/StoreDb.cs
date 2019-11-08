@@ -11,6 +11,7 @@ namespace ThAmCo.Products.Data
         public DbSet<PType> Types { get; set; }
         public DbSet<Brand> Brands { get; set; }
         public DbSet<Product> Products { get; set; }
+        public DbSet<PriceHistory> PriceHistory { get; set; }
 
         public StoreDb(DbContextOptions<StoreDb> options) : base(options)
         {
@@ -57,6 +58,15 @@ namespace ThAmCo.Products.Data
                 x.HasOne(p => p.Brand).WithMany()
                                       .HasForeignKey(p => p.BrandId)
                                       .IsRequired();
+            });
+
+            modelBuilder.Entity<PriceHistory>(x =>
+            {
+                x.Property(p => p.Price).IsRequired();
+                x.Property(p => p.CreatedDate).IsRequired();
+                x.HasOne(p => p.Product).WithMany()
+                                         .HasForeignKey(p => p.ProductId)
+                                         .IsRequired();
             });
 
             // Honour soft delete

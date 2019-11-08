@@ -84,6 +84,16 @@ namespace ThAmCo.Products.Data
             products.ForEach(p => context.Products.Add(p));
 
             await context.SaveChangesAsync();
+
+            var pricehistory = new List<PriceHistory>
+            {
+                new PriceHistory { Product = products[0], Price = Math.Round(10 + (random.NextDouble() * (100 - 10)), 2), CreatedDate = DateTime.Now },
+                new PriceHistory { Product = products[0], Price = Math.Round(10 + (random.NextDouble() * (100 - 10)), 2), CreatedDate = DateTime.Now },
+                new PriceHistory { Product = products[0], Price = Math.Round(10 + (random.NextDouble() * (100 - 10)), 2), CreatedDate = DateTime.Now },
+                new PriceHistory { Product = products[0], Price = Math.Round(10 + (random.NextDouble() * (100 - 10)), 2), CreatedDate = DateTime.Now }
+            };
+            pricehistory.ForEach(p => context.PriceHistory.Add(p));
+            await context.SaveChangesAsync();
         }
     }
 }
