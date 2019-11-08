@@ -90,6 +90,45 @@ namespace ThAmCo.Products.Web.Controllers
             return CreatedAtAction("GetProduct", new { id = product.Id }, ProductDto.ToProduct(product));
         }
 
+        // POST: api/Products/UpdateStock/{id}
+        [HttpPost("api/products/updatestock/{id}")]
+        public async Task<ActionResult<Product>> UpdateStock(int id, StockDto stock)
+        {
+            if (id != stock.Id)
+            {
+                return BadRequest();
+            }
+
+            var product = await _context.Products.FindAsync(id);
+
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            product.StockLevel += stock.AdditionalStock;
+
+            _context.Entry(product).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!ProductExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
         // DELETE: api/Products/5
         [HttpDelete("{id}")]
         public async Task<ActionResult<ProductDto>> DeleteProduct(int id)
