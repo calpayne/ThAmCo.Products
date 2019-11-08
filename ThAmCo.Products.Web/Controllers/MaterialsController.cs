@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ThAmCo.Products.Data;
+using ThAmCo.Products.Web.Models;
 
 namespace ThAmCo.Products.Web.Controllers
 {
@@ -22,16 +23,16 @@ namespace ThAmCo.Products.Web.Controllers
 
         // GET: api/Materials
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Material>>> GetMaterials()
+        public async Task<ActionResult<IEnumerable<MaterialDto>>> GetMaterials()
         {
-            return await _context.Materials.ToListAsync();
+            return await _context.Materials.Select(m => MaterialDto.Transform(m)).ToListAsync();
         }
 
         // GET: api/Materials/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Material>> GetMaterial(int id)
+        public async Task<ActionResult<MaterialDto>> GetMaterial(int id)
         {
-            var material = await _context.Materials.FindAsync(id);
+            var material = await _context.Materials.Select(m => MaterialDto.Transform(m)).FirstOrDefaultAsync(m => m.Id == id);
 
             if (material == null)
             {
@@ -43,14 +44,14 @@ namespace ThAmCo.Products.Web.Controllers
 
         // PUT: api/Materials/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutMaterial(int id, Material material)
+        public async Task<IActionResult> PutMaterial(int id, MaterialDto material)
         {
             if (id != material.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(material).State = EntityState.Modified;
+            _context.Entry(MaterialDto.ToMaterial(material)).State = EntityState.Modified;
 
             try
             {
@@ -73,9 +74,9 @@ namespace ThAmCo.Products.Web.Controllers
 
         // POST: api/Materials
         [HttpPost]
-        public async Task<ActionResult<Material>> PostMaterial(Material material)
+        public async Task<ActionResult<Material>> PostMaterial(MaterialDto material)
         {
-            _context.Materials.Add(material);
+            _context.Materials.Add(MaterialDto.ToMaterial(material));
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetMaterial", new { id = material.Id }, material);
@@ -83,7 +84,7 @@ namespace ThAmCo.Products.Web.Controllers
 
         // DELETE: api/Materials/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Material>> DeleteMaterial(int id)
+        public async Task<ActionResult<MaterialDto>> DeleteMaterial(int id)
         {
             var material = await _context.Materials.FindAsync(id);
             if (material == null)
@@ -94,7 +95,7 @@ namespace ThAmCo.Products.Web.Controllers
             _context.Materials.Remove(material);
             await _context.SaveChangesAsync();
 
-            return material;
+            return MaterialDto.Transform(material);
         }
 
         private bool MaterialExists(int id)

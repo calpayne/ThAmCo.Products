@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ThAmCo.Products.Data;
+using ThAmCo.Products.Web.Models;
 
 namespace ThAmCo.Products.Web.Controllers
 {
@@ -22,35 +23,35 @@ namespace ThAmCo.Products.Web.Controllers
 
         // GET: api/Types
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<PType>>> GetTypes()
+        public async Task<ActionResult<IEnumerable<TypeDto>>> GetTypes()
         {
-            return await _context.Types.ToListAsync();
+            return await _context.Types.Select(t => TypeDto.Transform(t)).ToListAsync();
         }
 
         // GET: api/Types/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<PType>> GetPType(int id)
+        public async Task<ActionResult<TypeDto>> GetType(int id)
         {
-            var pType = await _context.Types.FindAsync(id);
+            var type = await _context.Types.Select(t => TypeDto.Transform(t)).FirstOrDefaultAsync(t => t.Id == id);
 
-            if (pType == null)
+            if (type == null)
             {
                 return NotFound();
             }
 
-            return pType;
+            return type;
         }
 
         // PUT: api/Types/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutPType(int id, PType pType)
+        public async Task<IActionResult> PutType(int id, TypeDto type)
         {
-            if (id != pType.Id)
+            if (id != type.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(pType).State = EntityState.Modified;
+            _context.Entry(TypeDto.ToType(type)).State = EntityState.Modified;
 
             try
             {
@@ -58,7 +59,7 @@ namespace ThAmCo.Products.Web.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!PTypeExists(id))
+                if (!TypeExists(id))
                 {
                     return NotFound();
                 }
@@ -73,31 +74,31 @@ namespace ThAmCo.Products.Web.Controllers
 
         // POST: api/Types
         [HttpPost]
-        public async Task<ActionResult<PType>> PostPType(PType pType)
+        public async Task<ActionResult<TypeDto>> PostType(TypeDto type)
         {
-            _context.Types.Add(pType);
+            _context.Types.Add(TypeDto.ToType(type));
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetPType", new { id = pType.Id }, pType);
+            return CreatedAtAction("GetType", new { id = type.Id }, TypeDto.ToType(type));
         }
 
         // DELETE: api/Types/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<PType>> DeletePType(int id)
+        public async Task<ActionResult<TypeDto>> DeleteType(int id)
         {
-            var pType = await _context.Types.FindAsync(id);
-            if (pType == null)
+            var type = await _context.Types.FindAsync(id);
+            if (type == null)
             {
                 return NotFound();
             }
 
-            _context.Types.Remove(pType);
+            _context.Types.Remove(type);
             await _context.SaveChangesAsync();
 
-            return pType;
+            return TypeDto.Transform(type);
         }
 
-        private bool PTypeExists(int id)
+        private bool TypeExists(int id)
         {
             return _context.Types.Any(e => e.Id == id);
         }

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ThAmCo.Products.Data;
+using ThAmCo.Products.Web.Models;
 
 namespace ThAmCo.Products.Web.Controllers
 {
@@ -22,16 +23,16 @@ namespace ThAmCo.Products.Web.Controllers
 
         // GET: api/Brands
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Brand>>> GetBrands()
+        public async Task<ActionResult<IEnumerable<BrandDto>>> GetBrands()
         {
-            return await _context.Brands.ToListAsync();
+            return await _context.Brands.Select(b => BrandDto.Transform(b)).ToListAsync();
         }
 
         // GET: api/Brands/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Brand>> GetBrand(int id)
+        public async Task<ActionResult<BrandDto>> GetBrand(int id)
         {
-            var brand = await _context.Brands.FindAsync(id);
+            var brand = await _context.Brands.Select(b => BrandDto.Transform(b)).FirstOrDefaultAsync(b => b.Id == id);
 
             if (brand == null)
             {
@@ -43,14 +44,14 @@ namespace ThAmCo.Products.Web.Controllers
 
         // PUT: api/Brands/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutBrand(int id, Brand brand)
+        public async Task<IActionResult> PutBrand(int id, BrandDto brand)
         {
             if (id != brand.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(brand).State = EntityState.Modified;
+            _context.Entry(BrandDto.ToBrand(brand)).State = EntityState.Modified;
 
             try
             {
@@ -73,17 +74,17 @@ namespace ThAmCo.Products.Web.Controllers
 
         // POST: api/Brands
         [HttpPost]
-        public async Task<ActionResult<Brand>> PostBrand(Brand brand)
+        public async Task<ActionResult<BrandDto>> PostBrand(BrandDto brand)
         {
-            _context.Brands.Add(brand);
+            _context.Brands.Add(BrandDto.ToBrand(brand));
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetBrand", new { id = brand.Id }, brand);
+            return CreatedAtAction("GetBrand", new { id = brand.Id }, BrandDto.ToBrand(brand));
         }
 
         // DELETE: api/Brands/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Brand>> DeleteBrand(int id)
+        public async Task<ActionResult<BrandDto>> DeleteBrand(int id)
         {
             var brand = await _context.Brands.FindAsync(id);
             if (brand == null)
@@ -94,7 +95,7 @@ namespace ThAmCo.Products.Web.Controllers
             _context.Brands.Remove(brand);
             await _context.SaveChangesAsync();
 
-            return brand;
+            return BrandDto.Transform(brand);
         }
 
         private bool BrandExists(int id)

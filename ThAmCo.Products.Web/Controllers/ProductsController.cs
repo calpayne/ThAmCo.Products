@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ThAmCo.Products.Data;
+using ThAmCo.Products.Web.Models;
 
 namespace ThAmCo.Products.Web.Controllers
 {
@@ -22,21 +23,23 @@ namespace ThAmCo.Products.Web.Controllers
 
         // GET: api/Products
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
+        public async Task<ActionResult<IEnumerable<ProductDto>>> GetProducts()
         {
             return await _context.Products.Include(p => p.Brand)
                                           .Include(p => p.Material)
                                           .Include(p => p.Type)
+                                          .Select(p => ProductDto.Transform(p))
                                           .ToListAsync();
         }
 
         // GET: api/Products/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Product>> GetProduct(int id)
+        public async Task<ActionResult<ProductDto>> GetProduct(int id)
         {
             var product = await _context.Products.Include(p => p.Brand)
                                                  .Include(p => p.Material)
                                                  .Include(p => p.Type)
+                                                 .Select(p => ProductDto.Transform(p))
                                                  .FirstOrDefaultAsync(p => p.Id == id);
 
             if (product == null)
@@ -49,14 +52,14 @@ namespace ThAmCo.Products.Web.Controllers
 
         // PUT: api/Products/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutProduct(int id, Product product)
+        public async Task<IActionResult> PutProduct(int id, ProductDto product)
         {
             if (id != product.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(product).State = EntityState.Modified;
+            _context.Entry(ProductDto.ToProduct(product)).State = EntityState.Modified;
 
             try
             {
@@ -79,17 +82,17 @@ namespace ThAmCo.Products.Web.Controllers
 
         // POST: api/Products
         [HttpPost]
-        public async Task<ActionResult<Product>> PostProduct(Product product)
+        public async Task<ActionResult<Product>> PostProduct(ProductDto product)
         {
-            _context.Products.Add(product);
+            _context.Products.Add(ProductDto.ToProduct(product));
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetProduct", new { id = product.Id }, product);
+            return CreatedAtAction("GetProduct", new { id = product.Id }, ProductDto.ToProduct(product));
         }
 
         // DELETE: api/Products/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Product>> DeleteProduct(int id)
+        public async Task<ActionResult<ProductDto>> DeleteProduct(int id)
         {
             var product = await _context.Products.FindAsync(id);
             if (product == null)
@@ -100,7 +103,7 @@ namespace ThAmCo.Products.Web.Controllers
             _context.Products.Remove(product);
             await _context.SaveChangesAsync();
 
-            return product;
+            return ProductDto.Transform(product);
         }
 
         private bool ProductExists(int id)
