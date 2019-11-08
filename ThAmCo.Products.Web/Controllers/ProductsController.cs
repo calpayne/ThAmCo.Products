@@ -52,9 +52,16 @@ namespace ThAmCo.Products.Web.Controllers
 
         // GET: api/Products/PriceHistory/{id}
         [Route("pricehistory/{id}"), HttpGet]
-        public async Task<ActionResult<IEnumerable<PriceHistoryDto>>> GetPriceHistory()
+        public async Task<ActionResult<IEnumerable<PriceHistoryDto>>> GetPriceHistory(int id)
         {
-            return await _context.PriceHistory.Select(p => PriceHistoryDto.Transform(p)).ToListAsync();
+            if (!_context.PriceHistory.Any(e => e.ProductId == id))
+            {
+                return NotFound();
+            }
+
+            return await _context.PriceHistory.Where(p => p.ProductId == id)
+                                              .Select(p => PriceHistoryDto.Transform(p))
+                                              .ToListAsync();
         }
 
         // PUT: api/Products/5
