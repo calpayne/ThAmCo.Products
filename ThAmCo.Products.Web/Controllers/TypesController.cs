@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ThAmCo.Products.Data;
-using ThAmCo.Products.Web.Models;
+using ThAmCo.Products.Models;
 
 namespace ThAmCo.Products.Web.Controllers
 {

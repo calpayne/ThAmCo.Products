@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using ThAmCo.Products.Data;
+﻿using ThAmCo.Products.Data;
 
-namespace ThAmCo.Products.Web.Models
+namespace ThAmCo.Products.Models
 {
     public class BrandDto
     {

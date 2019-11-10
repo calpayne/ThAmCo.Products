@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ThAmCo.Products.Data;
-using ThAmCo.Products.Web.Models;
+using ThAmCo.Products.Models;
 
 namespace ThAmCo.Products.Web.Controllers
 {
@@ -39,7 +38,18 @@ namespace ThAmCo.Products.Web.Controllers
             var product = await _context.Products.Include(p => p.Brand)
                                                  .Include(p => p.Material)
                                                  .Include(p => p.Type)
-                                                 .Select(p => ProductDto.Transform(p))
+                                                 .Select(p => new ProductDto
+                                                 {
+                                                     Id = p.Id,
+                                                     Name = p.Name,
+                                                     Description = p.Description,
+                                                     Price = p.Price,
+                                                     StockLevel = p.StockLevel,
+                                                     Type = TypeDto.Transform(p.Type),
+                                                     Material = MaterialDto.Transform(p.Material),
+                                                     Brand = BrandDto.Transform(p.Brand)
+                                                 })
+                                                 //.Select(p => ProductDto.Transform(p))
                                                  .FirstOrDefaultAsync(p => p.Id == id);
 
             if (product == null)
