@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ThAmCo.Products.Data;
 using ThAmCo.Products.Models;
+using ThAmCo.Products.Services.Orders;
 
 namespace ThAmCo.Products.Web.Controllers
 {
@@ -14,10 +15,12 @@ namespace ThAmCo.Products.Web.Controllers
     public class ProductsController : ControllerBase
     {
         private readonly StoreDb _context;
+        private readonly IOrdersService _ordersService;
 
-        public ProductsController(StoreDb context)
+        public ProductsController(StoreDb context, IOrdersService orderService)
         {
             _context = context;
+            _ordersService = orderService;
         }
 
         // GET: api/Products
@@ -112,6 +115,37 @@ namespace ThAmCo.Products.Web.Controllers
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetProduct", new { id = product.Id }, ProductDto.ToProduct(product));
+        }
+
+        // POST: api/Products/{id}/Purchase
+        [HttpPost("api/products/{id}/purchase")]
+        public async Task<ActionResult<Product>> PurchaseProduct(int id, OrderDto order)
+        {
+            if (id != order.Product.Id)
+            {
+                return BadRequest();
+            }
+
+            var product = await _context.Products.FindAsync(id);
+
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            if (product.StockLevel <= 0)
+            {
+                return BadRequest();
+            }
+
+            var createOrder = await _ordersService.CreateOrder(order);
+
+            if (!createOrder)
+            {
+                return BadRequest();
+            }
+
+            return NoContent();
         }
 
         // POST: api/Products/UpdatePrice/{id}

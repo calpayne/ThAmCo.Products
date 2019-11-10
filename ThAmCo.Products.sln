@@ -7,7 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ThAmCo.Products.Web", "ThAm
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ThAmCo.Products.Data", "ThAmCo.Products.Data\ThAmCo.Products.Data.csproj", "{4F0E361E-0AEA-4C1E-B567-0C67D1133B50}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThAmCo.Products.Models", "ThAmCo.Products.Models\ThAmCo.Products.Models.csproj", "{A8C9559C-3E4B-4B81-92A4-DB521C6E2739}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ThAmCo.Products.Models", "ThAmCo.Products.Models\ThAmCo.Products.Models.csproj", "{A8C9559C-3E4B-4B81-92A4-DB521C6E2739}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThAmCo.Products.Services", "ThAmCo.Products.Services\ThAmCo.Products.Services.csproj", "{5A26B29D-5106-458D-9CA0-7A121A170E0F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{A8C9559C-3E4B-4B81-92A4-DB521C6E2739}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A8C9559C-3E4B-4B81-92A4-DB521C6E2739}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A8C9559C-3E4B-4B81-92A4-DB521C6E2739}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A26B29D-5106-458D-9CA0-7A121A170E0F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A26B29D-5106-458D-9CA0-7A121A170E0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A26B29D-5106-458D-9CA0-7A121A170E0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A26B29D-5106-458D-9CA0-7A121A170E0F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
