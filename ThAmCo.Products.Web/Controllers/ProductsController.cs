@@ -17,10 +17,10 @@ namespace ThAmCo.Products.Web.Controllers
         private readonly StoreDb _context;
         private readonly IOrdersService _ordersService;
 
-        public ProductsController(StoreDb context, IOrdersService orderService)
+        public ProductsController(StoreDb context, IOrdersService ordersService)
         {
             _context = context;
-            _ordersService = orderService;
+            _ordersService = ordersService;
         }
 
         // GET: api/Products
@@ -30,6 +30,23 @@ namespace ThAmCo.Products.Web.Controllers
             return await _context.Products.Include(p => p.Brand)
                                           .Include(p => p.Material)
                                           .Include(p => p.Type)
+                                          .Select(p => ProductDto.Transform(p))
+                                          .ToListAsync();
+        }
+
+        // GET: api/Products/Search
+        [HttpGet("search")]
+        public async Task<ActionResult<IEnumerable<ProductDto>>> GetProducts(int? brand, int? material, int? type, string term, double? minPrice, double? maxPrice)
+        {
+            return await _context.Products.Include(p => p.Brand)
+                                          .Include(p => p.Material)
+                                          .Include(p => p.Type)
+                                          .Where(p => term == null || (p.Name.Contains(term) || p.Description.Contains(term)))
+                                          .Where(p => brand == null || p.BrandId == brand)
+                                          .Where(p => material == null || p.MaterialId == material)
+                                          .Where(p => type == null || p.TypeId == type)
+                                          .Where(p => minPrice == null || p.Price >= minPrice)
+                                          .Where(p => maxPrice == null || p.Price <= maxPrice)
                                           .Select(p => ProductDto.Transform(p))
                                           .ToListAsync();
         }
