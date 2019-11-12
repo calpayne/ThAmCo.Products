@@ -26,7 +26,7 @@ namespace ThAmCo.Products.Models
                 StockLevel = p.StockLevel,
                 Type = TypeDto.Transform(p.Type),
                 Material = MaterialDto.Transform(p.Material),
-                Brand = BrandDto.Transform(p.Brand)
+                //Brand = BrandDto.Transform(p.Brand)
             };
         }
 
@@ -45,7 +45,7 @@ namespace ThAmCo.Products.Models
                 Active = true,
                 Type = TypeDto.ToType(p.Type),
                 Material = MaterialDto.ToMaterial(p.Material),
-                Brand = BrandDto.ToBrand(p.Brand)
+                //Brand = BrandDto.ToBrand(p.Brand)
             };
         }
     }

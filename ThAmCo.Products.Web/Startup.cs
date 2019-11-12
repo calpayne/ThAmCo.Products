@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ThAmCo.Products.Data;
+using ThAmCo.Products.Services.Brands;
 using ThAmCo.Products.Services.Orders;
 
 namespace ThAmCo.Products.Web
@@ -39,6 +40,7 @@ namespace ThAmCo.Products.Web
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddTransient<IOrdersService, OrdersService>();
+            services.AddHttpClient<IBrandsService, BrandsService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

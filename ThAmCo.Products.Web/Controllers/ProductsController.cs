@@ -67,7 +67,7 @@ namespace ThAmCo.Products.Web.Controllers
                                                      StockLevel = p.StockLevel,
                                                      Type = TypeDto.Transform(p.Type),
                                                      Material = MaterialDto.Transform(p.Material),
-                                                     Brand = BrandDto.Transform(p.Brand)
+                                                     //Brand = BrandDto.Transform(p.Brand)
                                                  })
                                                  //.Select(p => ProductDto.Transform(p))
                                                  .FirstOrDefaultAsync(p => p.Id == id);
