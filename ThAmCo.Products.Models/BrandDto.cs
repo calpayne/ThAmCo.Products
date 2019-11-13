@@ -1,6 +1,4 @@
-﻿using ThAmCo.Products.Data;
-
-namespace ThAmCo.Products.Models
+﻿namespace ThAmCo.Products.Models
 {
     public class BrandDto
     {

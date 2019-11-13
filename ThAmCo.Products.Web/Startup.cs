@@ -12,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ThAmCo.Products.Data;
 using ThAmCo.Products.Services.Brands;
+using ThAmCo.Products.Services.Categories;
 using ThAmCo.Products.Services.Orders;
 
 namespace ThAmCo.Products.Web
@@ -41,6 +42,7 @@ namespace ThAmCo.Products.Web
 
             services.AddTransient<IOrdersService, OrdersService>();
             services.AddHttpClient<IBrandsService, BrandsService>();
+            services.AddHttpClient<ICategoriesService, CategoriesService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
