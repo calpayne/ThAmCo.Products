@@ -141,6 +141,26 @@ namespace ThAmCo.Products.Web.Controllers
                 return BadRequest();
             }
 
+            product.StockLevel -= 1;
+
+            _context.Entry(product).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!ProductExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
             return NoContent();
         }
 
