@@ -27,24 +27,17 @@ namespace ThAmCo.Products.Web.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ProductDto>>> GetProducts()
         {
-            return await _context.Products.Include(p => p.Brand)
-                                          .Include(p => p.Material)
-                                          .Include(p => p.Type)
-                                          .Select(p => ProductDto.Transform(p))
+            return await _context.Products.Select(p => ProductDto.Transform(p))
                                           .ToListAsync();
         }
 
         // GET: api/Products/Search
         [HttpGet("search")]
-        public async Task<ActionResult<IEnumerable<ProductDto>>> GetProducts(int? brand, int? material, int? type, string term, double? minPrice, double? maxPrice)
+        public async Task<ActionResult<IEnumerable<ProductDto>>> GetProducts(int? brand, int? category, int? type, string term, double? minPrice, double? maxPrice)
         {
-            return await _context.Products.Include(p => p.Brand)
-                                          .Include(p => p.Material)
-                                          .Include(p => p.Type)
-                                          .Where(p => term == null || (p.Name.Contains(term) || p.Description.Contains(term)))
+            return await _context.Products.Where(p => term == null || (p.Name.Contains(term) || p.Description.Contains(term)))
                                           .Where(p => brand == null || p.BrandId == brand)
-                                          .Where(p => material == null || p.MaterialId == material)
-                                          .Where(p => type == null || p.TypeId == type)
+                                          .Where(p => category == null || p.CategoryId == category)
                                           .Where(p => minPrice == null || p.Price >= minPrice)
                                           .Where(p => maxPrice == null || p.Price <= maxPrice)
                                           .Select(p => ProductDto.Transform(p))
@@ -55,21 +48,7 @@ namespace ThAmCo.Products.Web.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<ProductDto>> GetProduct(int id)
         {
-            var product = await _context.Products.Include(p => p.Brand)
-                                                 .Include(p => p.Material)
-                                                 .Include(p => p.Type)
-                                                 .Select(p => new ProductDto
-                                                 {
-                                                     Id = p.Id,
-                                                     Name = p.Name,
-                                                     Description = p.Description,
-                                                     Price = p.Price,
-                                                     StockLevel = p.StockLevel,
-                                                     Type = TypeDto.Transform(p.Type),
-                                                     Material = MaterialDto.Transform(p.Material),
-                                                     //Brand = BrandDto.Transform(p.Brand)
-                                                 })
-                                                 //.Select(p => ProductDto.Transform(p))
+            var product = await _context.Products.Select(p => ProductDto.Transform(p))
                                                  .FirstOrDefaultAsync(p => p.Id == id);
 
             if (product == null)
