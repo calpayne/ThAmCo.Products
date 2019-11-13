@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ThAmCo.Products.Models
+﻿namespace ThAmCo.Products.Models
 {
     public class CategoryDto
     {

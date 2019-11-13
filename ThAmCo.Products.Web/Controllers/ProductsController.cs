@@ -33,7 +33,7 @@ namespace ThAmCo.Products.Web.Controllers
 
         // GET: api/Products/Search
         [HttpGet("search")]
-        public async Task<ActionResult<IEnumerable<ProductDto>>> GetProducts(int? brand, int? category, int? type, string term, double? minPrice, double? maxPrice)
+        public async Task<ActionResult<IEnumerable<ProductDto>>> GetProducts(int? brand, int? category, string term, double? minPrice, double? maxPrice)
         {
             return await _context.Products.Where(p => term == null || (p.Name.Contains(term) || p.Description.Contains(term)))
                                           .Where(p => brand == null || p.BrandId == brand)
