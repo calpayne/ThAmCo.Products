@@ -24,6 +24,12 @@ namespace ThAmCo.Products.Web.Controllers
         public async Task<ActionResult<IEnumerable<BrandDto>>> GetBrands()
         {
             var brands = await _brands.GetAllAsync();
+
+            if (brands == null)
+            {
+                return Array.Empty<BrandDto>();
+            }
+
             return brands.ToList();
         }
 

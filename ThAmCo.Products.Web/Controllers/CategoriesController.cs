@@ -24,6 +24,12 @@ namespace ThAmCo.Products.Web.Controllers
         public async Task<ActionResult<IEnumerable<CategoryDto>>> GetCategories()
         {
             var categories = await _categories.GetAllAsync();
+
+            if (categories == null)
+            {
+                return Array.Empty<CategoryDto>();
+            }
+
             return categories.ToList();
         }
 
