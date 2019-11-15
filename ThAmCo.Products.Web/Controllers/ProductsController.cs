@@ -33,11 +33,11 @@ namespace ThAmCo.Products.Web.Controllers
 
         // GET: api/Products/Search
         [HttpGet("search")]
-        public async Task<ActionResult<IEnumerable<ProductDto>>> GetProducts(int? brand, int? category, string term, double? minPrice, double? maxPrice)
+        public async Task<ActionResult<IEnumerable<ProductDto>>> GetProducts([FromRoute] int[] brands, [FromRoute] int[] categories, string term, double? minPrice, double? maxPrice)
         {
             return await _context.Products.Where(p => term == null || (p.Name.Contains(term) || p.Description.Contains(term)))
-                                          .Where(p => brand == null || p.BrandId == brand)
-                                          .Where(p => category == null || p.CategoryId == category)
+                                          .Where(p => brands.Count() == 0 || brands.Contains(p.BrandId))
+                                          .Where(p => categories.Count() == 0 || categories.Contains(p.CategoryId))
                                           .Where(p => minPrice == null || p.Price >= minPrice)
                                           .Where(p => maxPrice == null || p.Price <= maxPrice)
                                           .Select(p => ProductDto.Transform(p))
