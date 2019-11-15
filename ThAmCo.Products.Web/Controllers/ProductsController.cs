@@ -15,12 +15,12 @@ namespace ThAmCo.Products.Web.Controllers
     public class ProductsController : ControllerBase
     {
         private readonly StoreDb _context;
-        private readonly IOrdersService _ordersService;
+        private readonly IOrdersService _orders;
 
-        public ProductsController(StoreDb context, IOrdersService ordersService)
+        public ProductsController(StoreDb context, IOrdersService orders)
         {
             _context = context;
-            _ordersService = ordersService;
+            _orders = orders;
         }
 
         // GET: api/Products
@@ -134,7 +134,7 @@ namespace ThAmCo.Products.Web.Controllers
                 return BadRequest();
             }
 
-            var createOrder = await _ordersService.CreateOrder(order);
+            var createOrder = await _orders.CreateOrder(order);
 
             if (!createOrder)
             {
