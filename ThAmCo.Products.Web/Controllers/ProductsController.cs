@@ -36,6 +36,15 @@ namespace ThAmCo.Products.Web.Controllers
                                           .ToListAsync();
         }
 
+        // GET: api/Products/orderby/stock
+        [HttpGet("orderby/stock/")]
+        public async Task<ActionResult<IEnumerable<ProductDto>>> GetProducts()
+        {
+            return await _context.Products.OrderByDescending(p => p.StockLevel)
+                                          .Select(p => ProductDto.Transform(p))
+                                          .ToListAsync();
+        }
+
         // GET: api/Products/5
         [HttpGet("{id}")]
         public async Task<ActionResult<ProductDto>> GetProduct(int id)
