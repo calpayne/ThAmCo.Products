@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using ThAmCo.Products.Data;
 using ThAmCo.Products.Models;
 using ThAmCo.Products.Services.Orders;
+using ThAmCo.Products.Services.Products;
 
 namespace ThAmCo.Products.Web.Controllers
 {
@@ -14,12 +15,12 @@ namespace ThAmCo.Products.Web.Controllers
     [ApiController]
     public class ProductsController : ControllerBase
     {
-        private readonly StoreDb _context;
+        private readonly IProductsService _products;
         private readonly IOrdersService _orders;
 
-        public ProductsController(StoreDb context, IOrdersService orders)
+        public ProductsController(IProductsService products, IOrdersService orders)
         {
-            _context = context;
+            _products = products;
             _orders = orders;
         }
 
@@ -27,30 +28,23 @@ namespace ThAmCo.Products.Web.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ProductDto>>> GetProducts([FromQuery] int[] brands, [FromQuery] int[] categories, string term, double? minPrice, double? maxPrice)
         {
-            return await _context.Products.Where(p => term == null || (p.Name.Contains(term) || p.Description.Contains(term)))
-                                          .Where(p => brands.Count() == 0 || brands.Contains(p.BrandId))
-                                          .Where(p => categories.Count() == 0 || categories.Contains(p.CategoryId))
-                                          .Where(p => minPrice == null || p.Price >= minPrice)
-                                          .Where(p => maxPrice == null || p.Price <= maxPrice)
-                                          .Select(p => ProductDto.Transform(p))
-                                          .ToListAsync();
+            var products = await _products.GetAllAsync(brands, categories, term, minPrice, maxPrice);
+            return products.ToList();
         }
 
         // GET: api/Products/orderby/stock
         [HttpGet("orderby/stock/")]
         public async Task<ActionResult<IEnumerable<ProductDto>>> GetProducts()
         {
-            return await _context.Products.OrderByDescending(p => p.StockLevel)
-                                          .Select(p => ProductDto.Transform(p))
-                                          .ToListAsync();
+            var products = await _products.GetAllByStockAsync();
+            return products.ToList();
         }
 
         // GET: api/Products/5
         [HttpGet("{id}")]
         public async Task<ActionResult<ProductDto>> GetProduct(int id)
         {
-            var product = await _context.Products.Select(p => ProductDto.Transform(p))
-                                                 .FirstOrDefaultAsync(p => p.Id == id);
+            var product = await _products.GetByIDAsync(id);
 
             if (product == null)
             {
@@ -64,60 +58,23 @@ namespace ThAmCo.Products.Web.Controllers
         [Route("pricehistory/{id}"), HttpGet]
         public async Task<ActionResult<IEnumerable<PriceHistoryDto>>> GetPriceHistory(int id)
         {
-            if (!_context.PriceHistory.Any(e => e.ProductId == id))
+            var product = await _products.GetByIDAsync(id);
+
+            if (product == null)
             {
                 return NotFound();
             }
 
-            return await _context.PriceHistory.Where(p => p.ProductId == id)
-                                              .Select(p => PriceHistoryDto.Transform(p))
-                                              .ToListAsync();
-        }
+            var priceHistory = await _products.GetPriceHistoryAsync(id);
 
-        // PUT: api/Products/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutProduct(int id, ProductDto product)
-        {
-            if (id != product.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(ProductDto.ToProduct(product)).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ProductExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/Products
-        [HttpPost]
-        public async Task<ActionResult<Product>> PostProduct(ProductDto product)
-        {
-            _context.Products.Add(ProductDto.ToProduct(product));
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetProduct", new { id = product.Id }, ProductDto.ToProduct(product));
+            return priceHistory.ToList();
         }
 
         // POST: api/Products/{id}/Purchase
         [HttpPost("api/products/{id}/purchase")]
         public async Task<ActionResult<Product>> PurchaseProduct(int id, OrderDto order)
         {
+            /*
             if (id != order.Product.Id)
             {
                 return BadRequest();
@@ -161,7 +118,7 @@ namespace ThAmCo.Products.Web.Controllers
                     throw;
                 }
             }
-
+            */
             return NoContent();
         }
 
@@ -169,6 +126,7 @@ namespace ThAmCo.Products.Web.Controllers
         [HttpPost("api/products/updateprice/{id}")]
         public async Task<ActionResult<Product>> UpdatePrice(int id, PriceDto price)
         {
+            /*
             if (id != price.Id)
             {
                 return BadRequest();
@@ -202,6 +160,7 @@ namespace ThAmCo.Products.Web.Controllers
                     throw;
                 }
             }
+            */
 
             return NoContent();
         }
@@ -210,6 +169,7 @@ namespace ThAmCo.Products.Web.Controllers
         [HttpPost("api/products/updatestock/{id}")]
         public async Task<ActionResult<Product>> UpdateStock(int id, StockDto stock)
         {
+            /*
             if (id != stock.Id)
             {
                 return BadRequest();
@@ -241,8 +201,50 @@ namespace ThAmCo.Products.Web.Controllers
                     throw;
                 }
             }
+            */
 
             return NoContent();
+        }
+
+        /*
+        // PUT: api/Products/5
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutProduct(int id, ProductDto product)
+        {
+            if (id != product.Id)
+            {
+                return BadRequest();
+            }
+
+            _context.Entry(ProductDto.ToProduct(product)).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!ProductExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+        // POST: api/Products
+        [HttpPost]
+        public async Task<ActionResult<Product>> PostProduct(ProductDto product)
+        {
+            _context.Products.Add(ProductDto.ToProduct(product));
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetProduct", new { id = product.Id }, ProductDto.ToProduct(product));
         }
 
         // DELETE: api/Products/5
@@ -265,5 +267,6 @@ namespace ThAmCo.Products.Web.Controllers
         {
             return _context.Products.Any(e => e.Id == id);
         }
+        */
     }
 }

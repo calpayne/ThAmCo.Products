@@ -14,6 +14,7 @@ using ThAmCo.Products.Data;
 using ThAmCo.Products.Services.Brands;
 using ThAmCo.Products.Services.Categories;
 using ThAmCo.Products.Services.Orders;
+using ThAmCo.Products.Services.Products;
 
 namespace ThAmCo.Products.Web
 {
@@ -40,6 +41,7 @@ namespace ThAmCo.Products.Web
             services.AddDbContext<StoreDb>(options => options.UseSqlServer(Configuration.GetConnectionString("StoreConnection")));
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
+            services.AddTransient<IProductsService, ProductsService>();
             services.AddTransient<IOrdersService, OrdersService>();
             services.AddHttpClient<IBrandsService, BrandsService>();
             services.AddHttpClient<ICategoriesService, CategoriesService>();
