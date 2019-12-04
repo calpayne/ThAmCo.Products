@@ -37,6 +37,6 @@ steps:
   displayName: 'Deploying $(buildConfiguration) to test environment'
   inputs:
     azureSubscription: 'Azure for Students(d62a7fea-d138-4af2-a583-36271db165bf)'
-    appName: 'ThAmCo.Products'
+    appName: 'thamco.products170'
     appType: webAppLinux
     package: $(System.ArtifactsDirectory)/**/*.zip
