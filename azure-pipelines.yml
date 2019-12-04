@@ -37,8 +37,6 @@ steps:
   displayName: 'Deploying $(buildConfiguration) to test environment'
   inputs:
     azureSubscription: 'Azure for Students(d62a7fea-d138-4af2-a583-36271db165bf)'
-    appType: 'webAppLinux'
     appName: 'ThAmCo.Products'
-    package: '$(System.DefaultWorkingDirectory)/**/*.zip'
-    runtimeStack: 'DOTNETCORE|2.2'
-    startUpCommand: 'dotnet run'
+    appType: webAppLinux
+    package: $(System.ArtifactsDirectory)/**/*.zip
