@@ -36,7 +36,7 @@ steps:
 - task: AzureWebApp@1
   displayName: 'Deploying $(buildConfiguration) to test environment'
   inputs:
-    azureSubscription: 'Azure for Students'
+    azureSubscription: 'ThAmCo'
     appName: 'ThAmCo.Products'
     appType: webApp
     package: $(System.ArtifactsDirectory)/**/*.zip
