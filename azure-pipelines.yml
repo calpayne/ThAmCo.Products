@@ -33,3 +33,10 @@ steps:
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
     ArtifactName: 'ThAmCo.Products'
+- task: AzureWebApp@1
+  displayName: 'Deploying $(buildConfiguration) to test environment'
+  inputs:
+    azureSubscription: 'Azure for Students'
+    appName: 'ThAmCo.Products'
+    appType: webApp
+    package: $(System.ArtifactsDirectory)/**/*.zip
