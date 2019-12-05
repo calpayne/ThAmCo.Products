@@ -21,21 +21,21 @@ namespace ThAmCo.Products.Web.Controllers
 
         // GET: api/Categories
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CategoryDto>>> GetCategories()
+        public async Task<IActionResult> GetCategories()
         {
             var categories = await _categories.GetAllAsync();
 
             if (categories == null)
             {
-                return Array.Empty<CategoryDto>();
+                return NoContent();
             }
 
-            return categories.ToList();
+            return Ok(categories.ToList());
         }
 
         // GET: api/Categories/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<CategoryDto>> GetCategory(int id)
+        public async Task<IActionResult> GetCategory(int id)
         {
             var category = await _categories.GetByIDAsync(id);
 
@@ -44,7 +44,7 @@ namespace ThAmCo.Products.Web.Controllers
                 return NotFound();
             }
 
-            return category;
+            return Ok(category);
         }
     }
 }
