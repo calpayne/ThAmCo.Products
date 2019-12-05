@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ThAmCo.Products.Models;
@@ -8,14 +9,26 @@ namespace ThAmCo.Products.Services.Brands
 {
     public class FakeBrandsService : IBrandsService
     {
+        private readonly IEnumerable<BrandDto> _brands;
+
+        public FakeBrandsService()
+        {
+            _brands = new List<BrandDto>
+            {
+                new BrandDto { Id = 1, Name = "Soggy Sponge" },
+                new BrandDto { Id = 2, Name = "Damp Squib" },
+                new BrandDto { Id = 3, Name = "iStuff-R-Us" }
+            };
+        }
+
         public Task<IEnumerable<BrandDto>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            return Task.FromResult(_brands);
         }
 
         public Task<BrandDto> GetByIDAsync(int id)
         {
-            throw new NotImplementedException();
+            return Task.FromResult(_brands.FirstOrDefault(b => b.Id == id));
         }
     }
 }
