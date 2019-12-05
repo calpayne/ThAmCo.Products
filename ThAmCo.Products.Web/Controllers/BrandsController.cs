@@ -21,21 +21,21 @@ namespace ThAmCo.Products.Web.Controllers
 
         // GET: api/Brands
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<BrandDto>>> GetBrands()
+        public async Task<IActionResult> GetBrands()
         {
             var brands = await _brands.GetAllAsync();
 
             if (brands == null)
             {
-                return Array.Empty<BrandDto>();
+                return NoContent();
             }
 
-            return brands.ToList();
+            return Ok(brands.ToList());
         }
 
         // GET: api/Brands/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<BrandDto>> GetBrand(int id)
+        public async Task<IActionResult> GetBrand(int id)
         {
             var brand = await _brands.GetByIDAsync(id);
 
@@ -44,7 +44,7 @@ namespace ThAmCo.Products.Web.Controllers
                 return NotFound();
             }
 
-            return brand;
+            return Ok(brand);
         }
     }
 }
