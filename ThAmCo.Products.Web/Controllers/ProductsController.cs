@@ -26,23 +26,23 @@ namespace ThAmCo.Products.Web.Controllers
 
         // GET: api/Products
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ProductDto>>> GetProducts([FromQuery] int[] brands, [FromQuery] int[] categories, string term, double? minPrice, double? maxPrice)
+        public async Task<IActionResult> GetProducts([FromQuery] int[] brands, [FromQuery] int[] categories, string term, double? minPrice, double? maxPrice)
         {
             var products = await _products.GetAllAsync(brands, categories, term, minPrice, maxPrice);
-            return products.ToList();
+            return Ok(products.ToList());
         }
 
         // GET: api/Products/orderby/stock
         [HttpGet("orderby/stock/")]
-        public async Task<ActionResult<IEnumerable<ProductDto>>> GetProducts()
+        public async Task<IActionResult> GetProducts()
         {
             var products = await _products.GetAllByStockAsync();
-            return products.ToList();
+            return Ok(products.ToList());
         }
 
         // GET: api/Products/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<ProductDto>> GetProduct(int id)
+        public async Task<IActionResult> GetProduct(int id)
         {
             var product = await _products.GetByIDAsync(id);
 
@@ -51,12 +51,12 @@ namespace ThAmCo.Products.Web.Controllers
                 return NotFound();
             }
 
-            return product;
+            return Ok(product);
         }
 
         // GET: api/Products/PriceHistory/{id}
         [Route("pricehistory/{id}"), HttpGet]
-        public async Task<ActionResult<IEnumerable<PriceHistoryDto>>> GetPriceHistory(int id)
+        public async Task<IActionResult> GetPriceHistory(int id)
         {
             var product = await _products.GetByIDAsync(id);
 
@@ -67,12 +67,12 @@ namespace ThAmCo.Products.Web.Controllers
 
             var priceHistory = await _products.GetPriceHistoryAsync(id);
 
-            return priceHistory.ToList();
+            return Ok(priceHistory.ToList());
         }
 
         // POST: api/Products/{id}/Purchase
         [HttpPost("api/products/{id}/purchase")]
-        public async Task<ActionResult<Product>> PurchaseProduct(int id, OrderDto order)
+        public async Task<IActionResult> PurchaseProduct(int id, OrderDto order)
         {
             /*
             if (id != order.Product.Id)
@@ -124,7 +124,7 @@ namespace ThAmCo.Products.Web.Controllers
 
         // POST: api/Products/UpdatePrice/{id}
         [HttpPost("api/products/updateprice/{id}")]
-        public async Task<ActionResult<Product>> UpdatePrice(int id, PriceDto price)
+        public async Task<IActionResult> UpdatePrice(int id, PriceDto price)
         {
             /*
             if (id != price.Id)
@@ -167,7 +167,7 @@ namespace ThAmCo.Products.Web.Controllers
 
         // POST: api/Products/UpdateStock/{id}
         [HttpPost("api/products/updatestock/{id}")]
-        public async Task<ActionResult<Product>> UpdateStock(int id, StockDto stock)
+        public async Task<IActionResult> UpdateStock(int id, StockDto stock)
         {
             /*
             if (id != stock.Id)
