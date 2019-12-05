@@ -33,12 +33,12 @@ namespace ThAmCo.Products.Services.Products
 
             _priceHistory = new List<PriceHistory>
             {
-                new PriceHistory { Id = 1, ProductId = 1, Price = 10.25, CreatedDate = DateTime.Now },
-                new PriceHistory { Id = 2, ProductId = 1, Price = 12.25, CreatedDate = DateTime.Now },
-                new PriceHistory { Id = 3, ProductId = 1, Price = 14.25, CreatedDate = DateTime.Now },
-                new PriceHistory { Id = 4, ProductId = 1, Price = 16.25, CreatedDate = DateTime.Now },
-                new PriceHistory { Id = 5, ProductId = 1, Price = 18.25, CreatedDate = DateTime.Now },
-                new PriceHistory { Id = 6, ProductId = 1, Price = 20.25, CreatedDate = DateTime.Now }
+                new PriceHistory { Id = 1, ProductId = 1, Price = 10.25, CreatedDate = new DateTime(2019, 1, 18) },
+                new PriceHistory { Id = 2, ProductId = 1, Price = 12.25, CreatedDate = new DateTime(2019, 1, 19) },
+                new PriceHistory { Id = 3, ProductId = 1, Price = 14.25, CreatedDate = new DateTime(2019, 1, 20) },
+                new PriceHistory { Id = 4, ProductId = 1, Price = 16.25, CreatedDate = new DateTime(2019, 1, 21) },
+                new PriceHistory { Id = 5, ProductId = 1, Price = 18.25, CreatedDate = new DateTime(2019, 1, 22) },
+                new PriceHistory { Id = 6, ProductId = 1, Price = 20.25, CreatedDate = new DateTime(2019, 1, 23) }
             };
         }
 

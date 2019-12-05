@@ -63,5 +63,101 @@ namespace ThAmCo.Products.Tests
                 Assert.AreEqual(fake.StockLevel, real.StockLevel);
             }
         }
+
+        [TestMethod]
+        public async Task GetProduct_WithValidID_ShouldOkObject()
+        {
+            // Arrange
+            ProductDto fakeProduct = new ProductDto { Id = 1, BrandId = 1, CategoryId = 4, Description = "Poor quality fake faux leather cover loose enough to fit any mobile device.", Name = "Wrap It and Hope Cover", Price = 10.25, StockLevel = 1 };
+
+            var controller = new ProductsController(new FakeProductsService(), new OrdersService());
+
+            // Act
+            var result = await controller.GetProduct(1);
+
+            // Assert
+            Assert.IsNotNull(result);
+            var objResult = result as OkObjectResult;
+            Assert.IsNotNull(objResult);
+            var productResult = objResult.Value as ProductDto;
+            Assert.IsNotNull(productResult);
+            Assert.AreEqual(fakeProduct.Id, productResult.Id);
+            Assert.AreEqual(fakeProduct.BrandId, productResult.BrandId);
+            Assert.AreEqual(fakeProduct.CategoryId, productResult.CategoryId);
+            Assert.AreEqual(fakeProduct.Description, productResult.Description);
+            Assert.AreEqual(fakeProduct.Name, productResult.Name);
+            Assert.AreEqual(fakeProduct.Price, productResult.Price);
+            Assert.AreEqual(fakeProduct.StockLevel, productResult.StockLevel);
+        }
+
+        [TestMethod]
+        public async Task GetProduct_WithInvalidID_ShouldNotFound()
+        {
+            // Arrange
+            var controller = new ProductsController(new FakeProductsService(), new OrdersService());
+
+            // Act
+            var result = await controller.GetProduct(99999);
+
+            // Assert
+            Assert.IsNotNull(result);
+            var objResult = result as NotFoundResult;
+            Assert.IsNotNull(objResult);
+        }
+
+        [TestMethod]
+        public async Task GetPriceHistory_WithValidProduct_ShouldOkObject()
+        {
+            // Arrange
+            IEnumerable<PriceHistoryDto> fakeHistory = new List<PriceHistoryDto>
+            {
+                new PriceHistoryDto { Id = 1, Price = 10.25, CreatedDate = new DateTime(2019, 1, 18) },
+                new PriceHistoryDto { Id = 2, Price = 12.25, CreatedDate = new DateTime(2019, 1, 19) },
+                new PriceHistoryDto { Id = 3, Price = 14.25, CreatedDate = new DateTime(2019, 1, 20) },
+                new PriceHistoryDto { Id = 4, Price = 16.25, CreatedDate = new DateTime(2019, 1, 21) },
+                new PriceHistoryDto { Id = 5, Price = 18.25, CreatedDate = new DateTime(2019, 1, 22) },
+                new PriceHistoryDto { Id = 6, Price = 20.25, CreatedDate = new DateTime(2019, 1, 23) }
+            };
+
+            var controller = new ProductsController(new FakeProductsService(), new OrdersService());
+
+            // Act
+            var result = await controller.GetPriceHistory(1);
+
+            // Assert
+            Assert.IsNotNull(result);
+            var objResult = result as OkObjectResult;
+            Assert.IsNotNull(objResult);
+            var priceHistoryResult = objResult.Value as IEnumerable<PriceHistoryDto>;
+            Assert.IsNotNull(priceHistoryResult);
+            var realHistory = priceHistoryResult.ToList();
+            Assert.AreEqual(fakeHistory.Count(), realHistory.Count());
+
+            for (int i = 1; i <= realHistory.Count(); i++)
+            {
+                var real = realHistory.FirstOrDefault(p => p.Id == i);
+                var fake = fakeHistory.FirstOrDefault(p => p.Id == i);
+
+                Assert.AreEqual(fake.Id, real.Id);
+                Assert.AreEqual(fake.Price, real.Price);
+                Assert.AreEqual(fake.CreatedDate, real.CreatedDate);
+            }
+        }
+
+        [TestMethod]
+        public async Task GetPriceHistory_WithInvalidProduct_ShouldNotFound()
+        {
+            // Arrange
+            var controller = new ProductsController(new FakeProductsService(), new OrdersService());
+
+            // Act
+            var result = await controller.GetPriceHistory(99999);
+
+            // Assert
+            Assert.IsNotNull(result);
+            var objResult = result as NotFoundResult;
+            Assert.IsNotNull(objResult);
+        }
+
     }
 }
