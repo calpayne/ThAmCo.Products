@@ -14,12 +14,14 @@ namespace ThAmCo.Products.Tests
     public class BrandsTests
     {
         [TestMethod]
-        public async Task GetAllProducts_ShouldOkObject()
+        public async Task GetAllBrands_ShouldOkObject()
         {
             // Arrange
             IEnumerable<BrandDto> fakeBrands = new List<BrandDto>
             {
-                
+                new BrandDto { Id = 1, Name = "Soggy Sponge" },
+                new BrandDto { Id = 2, Name = "Damp Squib" },
+                new BrandDto { Id = 3, Name = "iStuff-R-Us" }
             };
 
             var controller = new BrandsController(new FakeBrandsService());
@@ -44,6 +46,42 @@ namespace ThAmCo.Products.Tests
                 Assert.AreEqual(fake.Id, real.Id);
                 Assert.AreEqual(fake.Name, real.Name);
             }
+        }
+
+        [TestMethod]
+        public async Task GetBrand_WithValidID_ShouldOkObject()
+        {
+            // Arrange
+            BrandDto fakeBrand = new BrandDto { Id = 1, Name = "Soggy Sponge" };
+
+            var controller = new BrandsController(new FakeBrandsService());
+
+            // Act
+            var result = await controller.GetBrand(1);
+
+            // Assert
+            Assert.IsNotNull(result);
+            var objResult = result as OkObjectResult;
+            Assert.IsNotNull(objResult);
+            var brandResult = objResult.Value as BrandDto;
+            Assert.IsNotNull(brandResult);
+            Assert.AreEqual(fakeBrand.Id, brandResult.Id);
+            Assert.AreEqual(fakeBrand.Name, brandResult.Name);
+        }
+
+        [TestMethod]
+        public async Task GetBrand_WithInvalidID_ShouldNotFound()
+        {
+            // Arrange
+            var controller = new BrandsController(new FakeBrandsService());
+
+            // Act
+            var result = await controller.GetBrand(99999);
+
+            // Assert
+            Assert.IsNotNull(result);
+            var objResult = result as NotFoundResult;
+            Assert.IsNotNull(objResult);
         }
     }
 }
