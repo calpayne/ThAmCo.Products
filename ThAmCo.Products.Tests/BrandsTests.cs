@@ -11,6 +11,7 @@ using ThAmCo.Products.Web.Controllers;
 
 namespace ThAmCo.Products.Tests
 {
+    [TestClass]
     public class BrandsTests
     {
         [TestMethod]
