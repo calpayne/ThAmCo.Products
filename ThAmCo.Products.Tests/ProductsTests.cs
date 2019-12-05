@@ -42,26 +42,26 @@ namespace ThAmCo.Products.Tests
 
             // Assert
             Assert.IsNotNull(result);
-            //var objResult = result as OkObjectResult;
-            //var productsResult = result as IEnumerable<ProductDto>;
-            var actResult = result.Value;
-            Assert.IsNotNull(actResult);
-            var products = actResult as IEnumerable<ProductDto>;
-            Assert.IsNotNull(products);
+            var objResult = result as OkObjectResult;
+            Assert.IsNotNull(objResult);
+            var productsResult = objResult.Value as IEnumerable<ProductDto>;
+            Assert.IsNotNull(productsResult);
+            var products = productsResult.ToList();
             Assert.AreEqual(fakeProducts.Count(), products.Count());
 
-            /*
-            for (int i = 0; i < products.Count(); i++)
+            for (int i = 1; i <= products.Count(); i++)
             {
-                Assert.AreEqual(fakeProducts.ElementAt(i).Id, products.ElementAt(i).Id);
-                Assert.AreEqual(fakeProducts.ElementAt(i).BrandId, products.ElementAt(i).BrandId);
-                Assert.AreEqual(fakeProducts.ElementAt(i).CategoryId, products.ElementAt(i).CategoryId);
-                Assert.AreEqual(fakeProducts.ElementAt(i).Description, products.ElementAt(i).Description);
-                Assert.AreEqual(fakeProducts.ElementAt(i).Name, products.ElementAt(i).Name);
-                Assert.AreEqual(fakeProducts.ElementAt(i).Price, products.ElementAt(i).Price);
-                Assert.AreEqual(fakeProducts.ElementAt(i).StockLevel, products.ElementAt(i).StockLevel);
+                var real = products.FirstOrDefault(p => p.Id == i);
+                var fake = fakeProducts.FirstOrDefault(p => p.Id == i);
+
+                Assert.AreEqual(fake.Id, real.Id);
+                Assert.AreEqual(fake.BrandId, real.BrandId);
+                Assert.AreEqual(fake.CategoryId, real.CategoryId);
+                Assert.AreEqual(fake.Description, real.Description);
+                Assert.AreEqual(fake.Name, real.Name);
+                Assert.AreEqual(fake.Price, real.Price);
+                Assert.AreEqual(fake.StockLevel, real.StockLevel);
             }
-            */
         }
     }
 }
