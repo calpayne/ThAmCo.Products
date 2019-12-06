@@ -37,7 +37,7 @@ namespace ThAmCo.Products.Web
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-
+            /*
             if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production")
             {
                 services.AddDbContext<StoreDb>(options =>
@@ -50,7 +50,9 @@ namespace ThAmCo.Products.Web
             }
 
             services.BuildServiceProvider().GetService<StoreDb>().Database.Migrate();
-
+            */
+            services.AddDbContext<StoreDb>(options =>
+                        options.UseSqlServer(Configuration.GetConnectionString("StoreConnection")));
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddTransient<IProductsService, ProductsService>();
