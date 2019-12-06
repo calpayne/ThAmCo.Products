@@ -27,7 +27,7 @@ namespace ThAmCo.Products.Web.Controllers
 
             if (brands == null)
             {
-                return Ok(NoContent());
+                return NoContent();
             }
 
             return Ok(brands.ToList());
@@ -41,7 +41,7 @@ namespace ThAmCo.Products.Web.Controllers
 
             if (brand == null)
             {
-                return Ok(NotFound());
+                return NotFound();
             }
 
             return Ok(brand);
