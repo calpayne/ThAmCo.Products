@@ -38,7 +38,19 @@ namespace ThAmCo.Products.Web
             });
 
 
-            services.AddDbContext<StoreDb>(options => options.UseSqlServer(Configuration.GetConnectionString("StoreConnection")));
+            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production")
+            {
+                services.AddDbContext<StoreDb>(options =>
+                        options.UseSqlServer(Configuration.GetConnectionString("StoreConnection")));
+            }
+            else
+            {
+                services.AddDbContext<StoreDb>(options =>
+                        options.UseSqlServer(Configuration.GetConnectionString("LocalConnection")));
+            }
+
+            services.BuildServiceProvider().GetService<StoreDb>().Database.Migrate();
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddTransient<IProductsService, ProductsService>();
