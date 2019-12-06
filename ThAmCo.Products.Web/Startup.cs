@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Polly;
 using ThAmCo.Products.Data;
 using ThAmCo.Products.Services.Brands;
 using ThAmCo.Products.Services.Categories;
@@ -42,11 +43,27 @@ namespace ThAmCo.Products.Web
             //services.BuildServiceProvider().GetService<StoreDb>().Database.EnsureDeleted();
             //services.BuildServiceProvider().GetService<StoreDb>().Database.Migrate();
 
+            services.AddHttpClient("RetryAndBreak")
+                    .AddTransientHttpErrorPolicy(p => p.WaitAndRetryAsync(new[] {
+                        TimeSpan.FromSeconds(1),
+                        TimeSpan.FromSeconds(5),
+                        TimeSpan.FromSeconds(10)
+                    }))
+                    .AddTransientHttpErrorPolicy(p => p.CircuitBreaker(5, TimeSpan.FromSeconds(30)));
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddTransient<IProductsService, ProductsService>();
             services.AddTransient<IOrdersService, OrdersService>();
-            services.AddHttpClient<IBrandsService, BrandsService>();
+            services.AddHttpClient<IBrandsService, BrandsService>(c => 
+                    {
+                        c.BaseAddress = new System.Uri(Configuration.GetConnectionString("UnderCutters"));
+                        c.DefaultRequestHeaders.Accept.ParseAdd("application/json");
+                    })
+                    .AddTransientHttpErrorPolicy(p => 
+                        p.WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))))
+                    .AddTransientHttpErrorPolicy(p => 
+                        p.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)));
             services.AddHttpClient<ICategoriesService, CategoriesService>();
         }
 

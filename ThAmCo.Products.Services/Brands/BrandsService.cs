@@ -12,32 +12,33 @@ namespace ThAmCo.Products.Services.Brands
     {
         private readonly HttpClient _client;
 
-        public BrandsService(IConfiguration config, HttpClient client)
+        public BrandsService(HttpClient client)
         {
-            client.BaseAddress = new System.Uri(config.GetConnectionString("UnderCutters"));
-            client.Timeout = TimeSpan.FromSeconds(5);
-            client.DefaultRequestHeaders.Accept.ParseAdd("application/json");
             _client = client;
         }
 
         public async Task<IEnumerable<BrandDto>> GetAllAsync()
         {
             IEnumerable<BrandDto> brands;
+            HttpResponseMessage response = await _client.GetAsync("Brand");
+
+            if (response.StatusCode == HttpStatusCode.NotFound)
+            {
+                return null;
+            }
 
             try
             {
-                HttpResponseMessage response = await _client.GetAsync("Brand");
-                if (response.StatusCode == HttpStatusCode.NotFound)
-                {
-                    return null;
-                }
                 response.EnsureSuccessStatusCode();
-
                 brands = await response.Content.ReadAsAsync<IEnumerable<BrandDto>>();
             }
             catch (HttpRequestException)
             {
-                brands = Array.Empty<BrandDto>();
+                return null;
+            }
+            catch (UnsupportedMediaTypeException)
+            {
+                return null;
             }
 
             return brands;
@@ -46,21 +47,25 @@ namespace ThAmCo.Products.Services.Brands
         public async Task<BrandDto> GetByIDAsync(int id)
         {
             BrandDto brand;
+            HttpResponseMessage response = await _client.GetAsync("Brand/" + id);
+
+            if (response.StatusCode == HttpStatusCode.NotFound)
+            {
+                return null;
+            }
 
             try
             {
-                HttpResponseMessage response = await _client.GetAsync("Brand/" + id);
-                if (response.StatusCode == HttpStatusCode.NotFound)
-                {
-                    return null;
-                }
                 response.EnsureSuccessStatusCode();
-
                 brand = await response.Content.ReadAsAsync<BrandDto>();
             }
             catch (HttpRequestException)
             {
-                brand = null;
+                return null;
+            }
+            catch (UnsupportedMediaTypeException)
+            {
+                return null;
             }
 
             return brand;
