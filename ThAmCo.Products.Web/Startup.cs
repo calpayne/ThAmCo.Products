@@ -64,7 +64,15 @@ namespace ThAmCo.Products.Web
                         p.WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))))
                     .AddTransientHttpErrorPolicy(p => 
                         p.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)));
-            services.AddHttpClient<ICategoriesService, CategoriesService>();
+            services.AddHttpClient<ICategoriesService, CategoriesService>(c =>
+                    {
+                        c.BaseAddress = new System.Uri(Configuration.GetConnectionString("UnderCutters"));
+                        c.DefaultRequestHeaders.Accept.ParseAdd("application/json");
+                    })
+                    .AddTransientHttpErrorPolicy(p =>
+                        p.WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))))
+                    .AddTransientHttpErrorPolicy(p =>
+                        p.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
