@@ -43,14 +43,6 @@ namespace ThAmCo.Products.Web
             //services.BuildServiceProvider().GetService<StoreDb>().Database.EnsureDeleted();
             //services.BuildServiceProvider().GetService<StoreDb>().Database.Migrate();
 
-            services.AddHttpClient("RetryAndBreak")
-                    .AddTransientHttpErrorPolicy(p => p.WaitAndRetryAsync(new[] {
-                        TimeSpan.FromSeconds(1),
-                        TimeSpan.FromSeconds(5),
-                        TimeSpan.FromSeconds(10)
-                    }))
-                    .AddTransientHttpErrorPolicy(p => p.CircuitBreaker(5, TimeSpan.FromSeconds(30)));
-
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddTransient<IProductsService, ProductsService>();
