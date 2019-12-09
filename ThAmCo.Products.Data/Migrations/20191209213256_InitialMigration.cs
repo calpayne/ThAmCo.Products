@@ -9,25 +9,6 @@ namespace ThAmCo.Products.Data.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Products",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    BrandId = table.Column<int>(nullable: false),
-                    CategoryId = table.Column<int>(nullable: false),
-                    Name = table.Column<string>(nullable: false),
-                    Description = table.Column<string>(nullable: false),
-                    Price = table.Column<double>(nullable: false),
-                    StockLevel = table.Column<int>(nullable: false, defaultValue: 0),
-                    Active = table.Column<bool>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Products", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "PriceHistory",
                 columns: table => new
                 {
@@ -40,18 +21,27 @@ namespace ThAmCo.Products.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_PriceHistory", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_PriceHistory_Products_ProductId",
-                        column: x => x.ProductId,
-                        principalTable: "Products",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ProductStock",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    ProductId = table.Column<int>(nullable: false),
+                    StockLevel = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProductStock", x => x.Id);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_PriceHistory_ProductId",
-                table: "PriceHistory",
-                column: "ProductId");
+                name: "IX_ProductStock_ProductId",
+                table: "ProductStock",
+                column: "ProductId",
+                unique: true);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -60,7 +50,7 @@ namespace ThAmCo.Products.Data.Migrations
                 name: "PriceHistory");
 
             migrationBuilder.DropTable(
-                name: "Products");
+                name: "ProductStock");
         }
     }
 }

@@ -45,8 +45,18 @@ namespace ThAmCo.Products.Web
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
-            services.AddTransient<IProductsService, ProductsService>();
+            services.AddHttpClient<IProductsService, ProductsService>(c =>
+                    {
+                        c.BaseAddress = new System.Uri(Configuration.GetConnectionString("UnderCutters"));
+                        c.DefaultRequestHeaders.Accept.ParseAdd("application/json");
+                    })
+                    .AddTransientHttpErrorPolicy(p =>
+                        p.WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))))
+                    .AddTransientHttpErrorPolicy(p =>
+                        p.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)));
+
             services.AddTransient<IOrdersService, OrdersService>();
+
             services.AddHttpClient<IBrandsService, BrandsService>(c => 
                     {
                         c.BaseAddress = new System.Uri(Configuration.GetConnectionString("UnderCutters"));
@@ -56,6 +66,7 @@ namespace ThAmCo.Products.Web
                         p.WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))))
                     .AddTransientHttpErrorPolicy(p => 
                         p.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)));
+
             services.AddHttpClient<ICategoriesService, CategoriesService>(c =>
                     {
                         c.BaseAddress = new System.Uri(Configuration.GetConnectionString("UnderCutters"));

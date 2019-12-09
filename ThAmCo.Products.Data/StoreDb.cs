@@ -4,7 +4,7 @@ namespace ThAmCo.Products.Data
 {
     public class StoreDb : DbContext
     {
-        public DbSet<Product> Products { get; set; }
+        public DbSet<ProductStock> ProductStock { get; set; }
         public DbSet<PriceHistory> PriceHistory { get; set; }
 
         public StoreDb(DbContextOptions<StoreDb> options) : base(options)
@@ -20,27 +20,19 @@ namespace ThAmCo.Products.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<Product>(x =>
+            modelBuilder.Entity<ProductStock>(x =>
             {
-                x.Property(p => p.Name).IsRequired();
-                x.Property(p => p.Description).IsRequired();
-                x.Property(p => p.Price).IsRequired();
-                x.Property(p => p.StockLevel).HasDefaultValue(0);
-                x.Property(p => p.BrandId).IsRequired();
-                x.Property(p => p.CategoryId).IsRequired();
+                x.Property(p => p.ProductId).IsRequired();
+                x.Property(p => p.StockLevel).IsRequired();
+                x.HasIndex(p => p.ProductId).IsUnique();
             });
 
             modelBuilder.Entity<PriceHistory>(x =>
             {
+                x.Property(p => p.ProductId).IsRequired();
                 x.Property(p => p.Price).IsRequired();
                 x.Property(p => p.CreatedDate).IsRequired();
-                x.HasOne(p => p.Product).WithMany()
-                                         .HasForeignKey(p => p.ProductId)
-                                         .IsRequired();
             });
-
-            // Honour soft delete
-            modelBuilder.Entity<Product>().HasQueryFilter(p => EF.Property<bool>(p, "Active") == true);
         }
     }
 }

@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using ThAmCo.Products.Data;
@@ -12,34 +14,98 @@ namespace ThAmCo.Products.Services.Products
     public class ProductsService : IProductsService
     {
         private readonly StoreDb _context;
+        private readonly HttpClient _client;
 
-        public ProductsService(StoreDb context)
+        public ProductsService(StoreDb context, HttpClient client)
         {
             _context = context;
+            _client = client;
+        }
+
+        private async Task<IEnumerable<ProductDto>> GetAllProducts()
+        {
+            IEnumerable<ProductDto> products;
+            HttpResponseMessage response = await _client.GetAsync("Product");
+
+            if (response.StatusCode == HttpStatusCode.NotFound)
+            {
+                return null;
+            }
+
+            try
+            {
+                response.EnsureSuccessStatusCode();
+                products = await response.Content.ReadAsAsync<IEnumerable<ProductDto>>();
+            }
+            catch (HttpRequestException)
+            {
+                return null;
+            }
+            catch (UnsupportedMediaTypeException)
+            {
+                return null;
+            }
+
+            foreach (ProductDto p in products)
+            {
+                try
+                {
+                    p.Price = _context.PriceHistory.OrderByDescending(d => d.CreatedDate).FirstOrDefault(pr => pr.ProductId == p.Id).Price;
+                    p.StockLevel = _context.ProductStock.FirstOrDefault(ps => ps.ProductId == p.Id).StockLevel;
+                }
+                catch(Exception)
+                {
+                    p.Price = 0;
+                    p.StockLevel = 0;
+                }
+            }
+
+            return products;
         }
 
         public async Task<IEnumerable<ProductDto>> GetAllAsync(int[] brands, int[] categories, string term, double? minPrice, double? maxPrice)
         {
-            return await _context.Products.Where(p => term == null || (p.Name.Contains(term) || p.Description.Contains(term)))
-                                          .Where(p => brands.Count() == 0 || brands.Contains(p.BrandId))
-                                          .Where(p => categories.Count() == 0 || categories.Contains(p.CategoryId))
-                                          .Where(p => minPrice == null || p.Price >= minPrice)
-                                          .Where(p => maxPrice == null || p.Price <= maxPrice)
-                                          .Select(p => ProductDto.Transform(p))
-                                          .ToListAsync();
+            IEnumerable<ProductDto> products = await GetAllProducts();
+
+            return products.Where(p => term == null || (p.Name.Contains(term) || p.Description.Contains(term)))
+                           .Where(p => brands.Count() == 0 || brands.Contains(p.BrandId))
+                           .Where(p => categories.Count() == 0 || categories.Contains(p.CategoryId))
+                           .Where(p => minPrice == null || p.Price >= minPrice)
+                           .Where(p => maxPrice == null || p.Price <= maxPrice);
         }
 
         public async Task<IEnumerable<ProductDto>> GetAllByStockAsync()
         {
-            return await _context.Products.OrderByDescending(p => p.StockLevel)
-                                         .Select(p => ProductDto.Transform(p))
-                                         .ToListAsync();
+            IEnumerable<ProductDto> products = await GetAllProducts();
+
+            return products.OrderByDescending(p => p.StockLevel);
         }
 
         public async Task<ProductDto> GetByIDAsync(int id)
         {
-            return await _context.Products.Select(p => ProductDto.Transform(p))
-                                          .FirstOrDefaultAsync(p => p.Id == id);
+            ProductDto product;
+            HttpResponseMessage response = await _client.GetAsync("Product/" + id);
+
+            if (response.StatusCode == HttpStatusCode.NotFound)
+            {
+                return null;
+            }
+
+            try
+            {
+                response.EnsureSuccessStatusCode();
+                product = await response.Content.ReadAsAsync<ProductDto>();
+            }
+            catch (HttpRequestException)
+            {
+                return null;
+            }
+            catch (UnsupportedMediaTypeException)
+            {
+                return null;
+            }
+
+            return product;
         }
 
         public async Task<IEnumerable<PriceHistoryDto>> GetPriceHistoryAsync(int id)
@@ -49,8 +115,9 @@ namespace ThAmCo.Products.Services.Products
                                               .ToListAsync();
         }
 
-        public async Task<bool> UpdateProductAsync(int id, ProductDto product)
+        public Task<bool> UpdateProductAsync(int id, ProductDto product)
         {
+            /*
             _context.Entry(ProductDto.ToProduct(product)).State = EntityState.Modified;
 
             try
@@ -68,8 +135,8 @@ namespace ThAmCo.Products.Services.Products
                     return false;
                 }
             }
-
-            return true;
+            */
+            return Task.FromResult(true);
         }
     }
 }

@@ -10,7 +10,7 @@ using ThAmCo.Products.Data;
 namespace ThAmCo.Products.Data.Migrations
 {
     [DbContext(typeof(StoreDb))]
-    [Migration("20191113143204_InitialMigration")]
+    [Migration("20191209213256_InitialMigration")]
     partial class InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -35,46 +35,25 @@ namespace ThAmCo.Products.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProductId");
-
                     b.ToTable("PriceHistory");
                 });
 
-            modelBuilder.Entity("ThAmCo.Products.Data.Product", b =>
+            modelBuilder.Entity("ThAmCo.Products.Data.ProductStock", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<bool>("Active");
+                    b.Property<int>("ProductId");
 
-                    b.Property<int>("BrandId");
-
-                    b.Property<int>("CategoryId");
-
-                    b.Property<string>("Description")
-                        .IsRequired();
-
-                    b.Property<string>("Name")
-                        .IsRequired();
-
-                    b.Property<double>("Price");
-
-                    b.Property<int>("StockLevel")
-                        .ValueGeneratedOnAdd()
-                        .HasDefaultValue(0);
+                    b.Property<int>("StockLevel");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Products");
-                });
+                    b.HasIndex("ProductId")
+                        .IsUnique();
 
-            modelBuilder.Entity("ThAmCo.Products.Data.PriceHistory", b =>
-                {
-                    b.HasOne("ThAmCo.Products.Data.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                    b.ToTable("ProductStock");
                 });
 #pragma warning restore 612, 618
         }
