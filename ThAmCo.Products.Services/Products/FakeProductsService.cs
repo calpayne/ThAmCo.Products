@@ -74,6 +74,7 @@ namespace ThAmCo.Products.Services.Products
                 Price = price.ResalePrice,
                 CreatedDate = DateTime.Now
             }});
+
             return Task.FromResult(true);
         }
 
@@ -87,6 +88,19 @@ namespace ThAmCo.Products.Services.Products
             }
 
             check.StockLevel = newStock;
+
+            return Task.FromResult(true);
+        }
+
+        public Task<bool> UpdateProductStockAsync(StockDto stock)
+        {
+            var product = _products.FirstOrDefault(p => p.Id == stock.ProductId);
+            if (product == null)
+            {
+                return Task.FromResult(false);
+            }
+
+            product.StockLevel += stock.AdditionalStock;
 
             return Task.FromResult(true);
         }

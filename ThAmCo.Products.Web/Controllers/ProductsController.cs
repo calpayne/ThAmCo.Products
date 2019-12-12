@@ -139,17 +139,16 @@ namespace ThAmCo.Products.Web.Controllers
             return Ok(price);
         }
 
-        // POST: api/Products/UpdateStock/{id}
-        [HttpPost("api/products/updatestock/{id}")]
-        public async Task<IActionResult> UpdateStock(int id, StockDto stock)
+        // POST: api/Products/UpdateStock/
+        [HttpPost("api/products/updatestock/")]
+        public async Task<IActionResult> UpdateStock(StockDto stock)
         {
-            /*
-            if (id != stock.Id)
+            if (!ModelState.IsValid)
             {
-                return BadRequest();
+                return BadRequest(ModelState);
             }
 
-            var product = await _context.Products.FindAsync(id);
+            var product = await _products.GetByIDAsync(stock.ProductId);
 
             if (product == null)
             {
@@ -158,26 +157,14 @@ namespace ThAmCo.Products.Web.Controllers
 
             product.StockLevel += stock.AdditionalStock;
 
-            _context.Entry(product).State = EntityState.Modified;
+            bool updated = await _products.UpdateProductStockAsync(stock);
 
-            try
+            if (!updated)
             {
-                await _context.SaveChangesAsync();
+                return BadRequest();
             }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ProductExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-            */
 
-            return NoContent();
+            return Ok(stock);
         }
 
         /*

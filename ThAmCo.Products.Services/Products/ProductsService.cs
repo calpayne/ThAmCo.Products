@@ -169,5 +169,25 @@ namespace ThAmCo.Products.Services.Products
 
             return true;
         }
+
+        public async Task<bool> UpdateProductStockAsync(StockDto stock)
+        {
+            ProductStock product = await _context.ProductStock.FirstOrDefaultAsync(p => p.ProductId == stock.ProductId);
+
+            product.StockLevel += stock.AdditionalStock;
+
+            _context.Entry(product).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return false;
+            }
+
+            return true;
+        }
     }
 }
