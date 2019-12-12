@@ -12,6 +12,7 @@ namespace ThAmCo.Products.Services.Products
         Task<IEnumerable<ProductDto>> GetAllByStockAsync();
         Task<ProductDto> GetByIDAsync(int id);
         Task<bool> UpdateProductStockAsync(int id, int newStock);
+        Task<bool> UpdateProductPriceAsync(PriceDto price);
         Task<IEnumerable<PriceHistoryDto>> GetPriceHistoryAsync(int id);
     }
 }

@@ -156,5 +156,18 @@ namespace ThAmCo.Products.Services.Products
 
             return true;
         }
+
+        public async Task<bool> UpdateProductPriceAsync(PriceDto price)
+        {
+            _context.PriceHistory.Add(new PriceHistory
+            {
+                ProductId = price.ProductId,
+                Price = price.ResalePrice,
+                CreatedDate = DateTime.Now
+            });
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
     }
 }

@@ -160,6 +160,72 @@ namespace ThAmCo.Products.Tests
         }
 
         [TestMethod]
+        public async Task UpdatePriceHistory_WithValidProduct_ShouldOkObject()
+        {
+            // Arrange
+            var controller = new ProductsController(new FakeProductsService(), new OrdersService());
+            PriceDto price = new PriceDto
+            {
+                ProductId = 1,
+                ResalePrice = 1.95
+            };
+
+            // Act
+            var result = await controller.UpdatePrice(price);
+
+            // Assert
+            Assert.IsNotNull(result);
+            var objResult = result as OkObjectResult;
+            Assert.IsNotNull(objResult);
+            var priceResult = objResult.Value as PriceDto;
+            Assert.IsNotNull(priceResult);
+            Assert.AreEqual(priceResult.ProductId, price.ProductId);
+            Assert.AreEqual(priceResult.ResalePrice, price.ResalePrice);
+        }
+
+        /*
+        [TestMethod]
+        public async Task UpdatePriceHistory_WithInvalidPrice_ShouldBadRequest()
+        {
+            // Arrange
+            var controller = new ProductsController(new FakeProductsService(), new OrdersService());
+            PriceDto price = new PriceDto
+            {
+                ProductId = 1,
+                ResalePrice = -1
+            };
+
+            // Act
+            var result = await controller.UpdatePrice(price);
+
+            // Assert
+            Assert.IsNotNull(result);
+            var objResult = result as BadRequestResult;
+            Assert.IsNotNull(objResult);
+        }
+        */
+
+        [TestMethod]
+        public async Task UpdatePriceHistory_WithInvalidProduct_ShouldNotFound()
+        {
+            // Arrange
+            var controller = new ProductsController(new FakeProductsService(), new OrdersService());
+            PriceDto price = new PriceDto
+            {
+                ProductId = 9999,
+                ResalePrice = 1.00
+            };
+
+            // Act
+            var result = await controller.UpdatePrice(price);
+
+            // Assert
+            Assert.IsNotNull(result);
+            var objResult = result as NotFoundResult;
+            Assert.IsNotNull(objResult);
+        }
+
+        [TestMethod]
         public async Task PurchaseProduct_WithValidProduct_ShouldOkObject()
         {
             // Arrange
@@ -240,6 +306,5 @@ namespace ThAmCo.Products.Tests
             var objResult = result as BadRequestResult;
             Assert.IsNotNull(objResult);
         }
-
     }
 }

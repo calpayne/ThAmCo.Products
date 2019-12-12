@@ -1,14 +1,13 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace ThAmCo.Products.Models
 {
     public class PriceDto
     {
-        public int Id { get; set; }
-        public double ResalePrice
-        {
-            get { return Math.Round(ResalePrice, 2); }
-            set { ResalePrice = value; }
-        }
+        [Required]
+        public int ProductId { get; set; }
+        [Required, Range(0.01, Double.MaxValue)]
+        public double ResalePrice { get; set; }
     }
 }

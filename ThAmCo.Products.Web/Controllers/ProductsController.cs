@@ -113,47 +113,30 @@ namespace ThAmCo.Products.Web.Controllers
             return Ok(order);
         }
 
-        // POST: api/Products/UpdatePrice/{id}
-        [HttpPost("api/products/updateprice/{id}")]
-        public async Task<IActionResult> UpdatePrice(int id, PriceDto price)
+        // POST: api/Products/UpdatePrice/
+        [HttpPost("api/products/updateprice/")]
+        public async Task<IActionResult> UpdatePrice(PriceDto price)
         {
-            /*
-            if (id != price.Id)
+            if (!ModelState.IsValid)
             {
-                return BadRequest();
+                return BadRequest(ModelState);
             }
 
-            var product = await _context.Products.FindAsync(id);
+            var product = await _products.GetByIDAsync(price.ProductId);
 
             if (product == null)
             {
                 return NotFound();
             }
 
-            product.Price = price.ResalePrice;
-            _context.Entry(product).State = EntityState.Modified;
-
-            var priceHistory = new PriceHistory { Price = price.ResalePrice, Product = product };
-            _context.PriceHistory.Add(priceHistory);
-
-            try
+            bool created = await _products.UpdateProductPriceAsync(price);
+            
+            if (!created)
             {
-                await _context.SaveChangesAsync();
+                return BadRequest();
             }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ProductExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-            */
 
-            return NoContent();
+            return Ok(price);
         }
 
         // POST: api/Products/UpdateStock/{id}
