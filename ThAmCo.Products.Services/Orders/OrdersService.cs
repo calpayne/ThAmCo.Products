@@ -8,7 +8,7 @@ namespace ThAmCo.Products.Services.Orders
     {
         public Task<bool> CreateOrder(OrderDto order)
         {
-            throw new NotImplementedException();
+            return Task.FromResult(true);
         }
     }
 }

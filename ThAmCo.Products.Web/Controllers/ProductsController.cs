@@ -70,8 +70,8 @@ namespace ThAmCo.Products.Web.Controllers
             return Ok(priceHistory.ToList());
         }
 
-        // POST: api/Products/{id}/Purchase
-        [HttpPost("api/products/{id}/purchase")]
+        // POST: api/Products/Purchase/{id}
+        [HttpPost("purchase/{id}")]
         public async Task<IActionResult> PurchaseProduct(int id, OrderDto order)
         {
             if (id != order.Product.Id)
