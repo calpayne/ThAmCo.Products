@@ -114,7 +114,7 @@ namespace ThAmCo.Products.Web.Controllers
         }
 
         // POST: api/Products/UpdatePrice/
-        [HttpPost("api/products/updateprice/")]
+        [HttpPost("updateprice/")]
         public async Task<IActionResult> UpdatePrice(PriceDto price)
         {
             if (!ModelState.IsValid)
