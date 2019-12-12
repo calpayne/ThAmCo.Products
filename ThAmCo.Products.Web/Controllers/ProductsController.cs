@@ -155,8 +155,6 @@ namespace ThAmCo.Products.Web.Controllers
                 return NotFound();
             }
 
-            product.StockLevel += stock.AdditionalStock;
-
             bool updated = await _products.UpdateProductStockAsync(stock);
 
             if (!updated)

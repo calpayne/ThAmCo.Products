@@ -264,7 +264,7 @@ namespace ThAmCo.Products.Tests
         }
 
         [TestMethod]
-        public async Task PurchaseProduct_WithInValidProduct_ShouldNotFound()
+        public async Task PurchaseProduct_WithInvalidProduct_ShouldNotFound()
         {
             // Arrange
             ProductDto product = new ProductDto { Id = 9999, BrandId = 1, CategoryId = 4, Description = "Poor quality fake faux leather cover loose enough to fit any mobile device.", Name = "Wrap It and Hope Cover", Price = 10.25, StockLevel = 1 };
@@ -304,6 +304,62 @@ namespace ThAmCo.Products.Tests
             // Assert
             Assert.IsNotNull(result);
             var objResult = result as BadRequestResult;
+            Assert.IsNotNull(objResult);
+        }
+
+        [TestMethod]
+        public async Task UpdateProductStock_WithValidProduct_ShouldOkObject()
+        {
+            // Arrange
+            ProductDto product = new ProductDto { Id = 1, BrandId = 1, CategoryId = 4, Description = "Poor quality fake faux leather cover loose enough to fit any mobile device.", Name = "Wrap It and Hope Cover", Price = 10.25, StockLevel = 1 };
+            StockDto stock = new StockDto
+            {
+                ProductId = 1,
+                AdditionalStock = 10
+            };
+
+            var controller = new ProductsController(new FakeProductsService(), new OrdersService());
+
+            // Act
+            var result = await controller.UpdateStock(stock);
+            var result2 = await controller.GetProduct(product.Id);
+
+            // Assert
+            Assert.IsNotNull(result);
+            var objResult = result as OkObjectResult;
+            Assert.IsNotNull(objResult);
+            var stockResult = objResult.Value as StockDto;
+            Assert.IsNotNull(stockResult);
+            Assert.AreEqual(stockResult.ProductId, stock.ProductId);
+            Assert.AreEqual(stockResult.AdditionalStock, stock.AdditionalStock);
+
+            Assert.IsNotNull(result2);
+            var objResult2 = result2 as OkObjectResult;
+            Assert.IsNotNull(objResult2);
+            var productResult = objResult2.Value as ProductDto;
+            Assert.IsNotNull(productResult);
+            Assert.AreNotEqual(productResult.StockLevel, product.StockLevel);
+            Assert.AreEqual(productResult.StockLevel, (product.StockLevel + 10));
+        }
+
+        [TestMethod]
+        public async Task UpdateProductStock_WithInvalidProduct_ShouldNotFound()
+        {
+            // Arrange
+            StockDto stock = new StockDto
+            {
+                ProductId = 9999,
+                AdditionalStock = 10
+            };
+
+            var controller = new ProductsController(new FakeProductsService(), new OrdersService());
+
+            // Act (making order)
+            var result = await controller.UpdateStock(stock);
+
+            // Assert
+            Assert.IsNotNull(result);
+            var objResult = result as NotFoundResult;
             Assert.IsNotNull(objResult);
         }
     }
