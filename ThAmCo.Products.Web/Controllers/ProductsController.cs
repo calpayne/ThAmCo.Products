@@ -74,13 +74,12 @@ namespace ThAmCo.Products.Web.Controllers
         [HttpPost("api/products/{id}/purchase")]
         public async Task<IActionResult> PurchaseProduct(int id, OrderDto order)
         {
-            /*
             if (id != order.Product.Id)
             {
                 return BadRequest();
             }
 
-            var product = await _context.Products.FindAsync(id);
+            var product = await _products.GetByIDAsync(id);
 
             if (product == null)
             {
@@ -92,34 +91,26 @@ namespace ThAmCo.Products.Web.Controllers
                 return BadRequest();
             }
 
+            var newStock = product.StockLevel - 1;
+            var update = await _products.UpdateProductStockAsync(product.Id, newStock);
+
+            if (!update)
+            {
+                BadRequest();
+            }
+
             var createOrder = await _orders.CreateOrder(order);
 
             if (!createOrder)
             {
+                // add the stock back since the order wasn't created.
+                var newStocku = product.StockLevel + 1;
+                var updateu = await _products.UpdateProductStockAsync(product.Id, newStocku);
+
                 return BadRequest();
             }
 
-            product.StockLevel -= 1;
-
-            _context.Entry(product).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ProductExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-            */
-            return NoContent();
+            return Ok(order);
         }
 
         // POST: api/Products/UpdatePrice/{id}

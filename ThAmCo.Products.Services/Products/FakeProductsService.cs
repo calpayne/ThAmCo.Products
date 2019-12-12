@@ -67,7 +67,7 @@ namespace ThAmCo.Products.Services.Products
                                                 .Select(p => PriceHistoryDto.Transform(p)));
         }
 
-        public Task<bool> UpdateProductAsync(int id, ProductDto product)
+        public Task<bool> UpdateProductStockAsync(int id, int newStock)
         {
             var check = _products.FirstOrDefault(p => p.Id == id);
 
@@ -76,7 +76,7 @@ namespace ThAmCo.Products.Services.Products
                 return Task.FromResult(false);
             }
 
-            check = product;
+            check.StockLevel = newStock;
 
             return Task.FromResult(true);
         }

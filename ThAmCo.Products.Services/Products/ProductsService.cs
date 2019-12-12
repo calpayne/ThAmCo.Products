@@ -115,10 +115,17 @@ namespace ThAmCo.Products.Services.Products
                                               .ToListAsync();
         }
 
-        public Task<bool> UpdateProductAsync(int id, ProductDto product)
+        public async Task<bool> UpdateProductStockAsync(int id, int newStock)
         {
-            /*
-            _context.Entry(ProductDto.ToProduct(product)).State = EntityState.Modified;
+            ProductStock stock = _context.ProductStock.FirstOrDefault(s => s.ProductId == id);
+
+            if (stock == null)
+            {
+                return false;
+            }
+
+            stock.StockLevel = newStock;
+            _context.Entry(stock).State = EntityState.Modified;
 
             try
             {
@@ -126,7 +133,7 @@ namespace ThAmCo.Products.Services.Products
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!_context.Products.Any(e => e.Id == id))
+                if (!_context.ProductStock.Any(e => e.ProductId == id))
                 {
                     return false;
                 }
@@ -135,8 +142,8 @@ namespace ThAmCo.Products.Services.Products
                     return false;
                 }
             }
-            */
-            return Task.FromResult(true);
+
+            return true;
         }
     }
 }
