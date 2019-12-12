@@ -105,6 +105,17 @@ namespace ThAmCo.Products.Services.Products
                 return null;
             }
 
+            try
+            {
+                product.Price = _context.PriceHistory.OrderByDescending(d => d.CreatedDate).FirstOrDefault(pr => pr.ProductId == product.Id).Price;
+                product.StockLevel = _context.ProductStock.FirstOrDefault(ps => ps.ProductId == product.Id).StockLevel;
+            }
+            catch (Exception)
+            {
+                product.Price = 0;
+                product.StockLevel = 0;
+            }
+
             return product;
         }
 
