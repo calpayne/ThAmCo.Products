@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -183,12 +184,12 @@ namespace ThAmCo.Products.Tests
             Assert.AreEqual(priceResult.ResalePrice, price.ResalePrice);
         }
 
-        /*
+        
         [TestMethod]
-        public async Task UpdatePriceHistory_WithInvalidPrice_ShouldBadRequest()
+        public void UpdatePriceHistory_ModelValidate_ShouldBeFalse()
         {
             // Arrange
-            var controller = new ProductsController(new FakeProductsService(), new OrdersService());
+            var validationResultList = new List<ValidationResult>();
             PriceDto price = new PriceDto
             {
                 ProductId = 1,
@@ -196,14 +197,14 @@ namespace ThAmCo.Products.Tests
             };
 
             // Act
-            var result = await controller.UpdatePrice(price);
+            var result = Validator.TryValidateObject(price, new ValidationContext(price), validationResultList, true);
 
             // Assert
-            Assert.IsNotNull(result);
-            var objResult = result as BadRequestResult;
-            Assert.IsNotNull(objResult);
+            Assert.IsFalse(result);
+            Assert.AreEqual(1, validationResultList.Count);
+            Assert.AreEqual("ResalePrice", validationResultList[0].MemberNames.ElementAt(0));
+            Assert.AreEqual("The field ResalePrice must be between 0.01 and 1.79769313486232E+308.", validationResultList[0].ErrorMessage);
         }
-        */
 
         [TestMethod]
         public async Task UpdatePriceHistory_WithInvalidProduct_ShouldNotFound()
