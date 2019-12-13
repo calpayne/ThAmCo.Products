@@ -183,7 +183,6 @@ namespace ThAmCo.Products.Tests
             Assert.AreEqual(priceResult.ProductId, price.ProductId);
             Assert.AreEqual(priceResult.ResalePrice, price.ResalePrice);
         }
-
         
         [TestMethod]
         public void UpdatePriceHistory_ModelValidate_ShouldBeFalse()
@@ -204,6 +203,27 @@ namespace ThAmCo.Products.Tests
             Assert.AreEqual(1, validationResultList.Count);
             Assert.AreEqual("ResalePrice", validationResultList[0].MemberNames.ElementAt(0));
             Assert.AreEqual("The field ResalePrice must be between 0.01 and 1.79769313486232E+308.", validationResultList[0].ErrorMessage);
+        }
+
+        [TestMethod]
+        public async Task UpdatePriceHistory_WithInvalidModelState_ShouldBadRequest()
+        {
+            // Arrange
+            var controller = new ProductsController(new FakeProductsService(), new OrdersService());
+            controller.ModelState.AddModelError("test", "test");
+            PriceDto price = new PriceDto
+            {
+                ProductId = 1,
+                ResalePrice = -1
+            };
+
+            // Act
+            var result = await controller.UpdatePrice(price);
+
+            // Assert
+            Assert.IsNotNull(result);
+            var objResult = result as BadRequestObjectResult;
+            Assert.IsNotNull(objResult);
         }
 
         [TestMethod]
