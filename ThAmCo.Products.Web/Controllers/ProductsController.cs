@@ -29,6 +29,12 @@ namespace ThAmCo.Products.Web.Controllers
         public async Task<IActionResult> GetProducts([FromQuery] int[] brands, [FromQuery] int[] categories, string term, double? minPrice, double? maxPrice)
         {
             var products = await _products.GetAllAsync(brands, categories, term, minPrice, maxPrice);
+
+            if (products.Count() == 0)
+            {
+                return NoContent();
+            }
+
             return Ok(products.ToList());
         }
 
@@ -37,6 +43,12 @@ namespace ThAmCo.Products.Web.Controllers
         public async Task<IActionResult> GetProducts()
         {
             var products = await _products.GetAllByStockAsync();
+
+            if (products.Count() == 0)
+            {
+                return NoContent();
+            }
+
             return Ok(products.ToList());
         }
 

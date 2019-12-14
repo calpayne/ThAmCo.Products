@@ -66,6 +66,64 @@ namespace ThAmCo.Products.Tests
         }
 
         [TestMethod]
+        public async Task GetAllProducts_WithValidSearch_ShouldOkObject()
+        {
+            // Arrange
+            IEnumerable<ProductDto> fakeProducts = new List<ProductDto>
+            {
+                new ProductDto { Id = 5, BrandId = 1, CategoryId = 4, Description = "Place your device within the water-tight container, fill with water and enjoy the cushioned protection from bumps and bangs.", Name = "Water Bath Case", Price = 20.25, StockLevel = 5 },
+                new ProductDto { Id = 9, BrandId = 1, CategoryId = 4, Description = "Coat your mobile device screen in a scratch resistant, opaque film.", Name = "Spray Paint Screen Protector", Price = 45.25, StockLevel = 8 },
+                new ProductDto { Id = 10, BrandId = 2, CategoryId = 3, Description = "For his or her sensory pleasure. Fits few known smartphones.", Name = "Rippled Screen Protector", Price = 85.25, StockLevel = 5 }
+            };
+
+            var controller = new ProductsController(new FakeProductsService(), new OrdersService());
+
+            // Act
+            int[] brands = { 1, 2 };
+            int[] categories = { 4, 3 };
+
+            var result = await controller.GetProducts(brands, categories, "fi", 20, 85.25);
+
+            // Assert
+            Assert.IsNotNull(result);
+            var objResult = result as OkObjectResult;
+            Assert.IsNotNull(objResult);
+            var productsResult = objResult.Value as IEnumerable<ProductDto>;
+            Assert.IsNotNull(productsResult);
+            var products = productsResult.ToList();
+            Assert.AreEqual(fakeProducts.Count(), products.Count());
+
+            for (int i = 0; i < products.Count(); i++)
+            {
+                Assert.AreEqual(fakeProducts.ElementAt(i).Id, products.ElementAt(i).Id);
+                Assert.AreEqual(fakeProducts.ElementAt(i).BrandId, products.ElementAt(i).BrandId);
+                Assert.AreEqual(fakeProducts.ElementAt(i).CategoryId, products.ElementAt(i).CategoryId);
+                Assert.AreEqual(fakeProducts.ElementAt(i).Description, products.ElementAt(i).Description);
+                Assert.AreEqual(fakeProducts.ElementAt(i).Name, products.ElementAt(i).Name);
+                Assert.AreEqual(fakeProducts.ElementAt(i).Price, products.ElementAt(i).Price);
+                Assert.AreEqual(fakeProducts.ElementAt(i).StockLevel, products.ElementAt(i).StockLevel);
+            }
+        }
+
+        [TestMethod]
+        public async Task GetAllProducts_WithNoResultsSearch_ShouldNoContent()
+        {
+            // Arrange
+            var controller = new ProductsController(new FakeProductsService(), new OrdersService());
+
+            // Act
+            int[] brands = { 20 };
+            int[] categories = { 20 };
+
+            var result = await controller.GetProducts(brands, categories, "test", 20, 85.25);
+
+            // Assert
+            Assert.IsNotNull(result);
+            var objResult = result as NoContentResult;
+            Assert.IsNotNull(objResult);
+        }
+
+        [TestMethod]
         public async Task GetProduct_WithValidID_ShouldOkObject()
         {
             // Arrange
