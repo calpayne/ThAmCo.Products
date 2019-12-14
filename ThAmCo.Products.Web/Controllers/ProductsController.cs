@@ -72,14 +72,14 @@ namespace ThAmCo.Products.Web.Controllers
 
         // POST: api/Products/Purchase/{id}
         [HttpPost("purchase/{id}")]
-        public async Task<IActionResult> PurchaseProduct(int id, OrderDto order)
+        public async Task<IActionResult> PurchaseProduct(OrderDto order)
         {
-            if (id != order.Product.Id)
+            if (!ModelState.IsValid)
             {
-                return BadRequest();
+                return BadRequest(ModelState);
             }
 
-            var product = await _products.GetByIDAsync(id);
+            var product = await _products.GetByIDAsync(order.Product.Id);
 
             if (product == null)
             {

@@ -250,20 +250,19 @@ namespace ThAmCo.Products.Tests
         public async Task PurchaseProduct_WithValidProduct_ShouldOkObject()
         {
             // Arrange
-            ProductDto product = new ProductDto { Id = 1, BrandId = 1, CategoryId = 4, Description = "Poor quality fake faux leather cover loose enough to fit any mobile device.", Name = "Wrap It and Hope Cover", Price = 10.25, StockLevel = 1 };
             OrderDto order = new OrderDto
             {
                 Customer = new CustomerDto(),
-                Product = product
-            };
+                Product = new ProductDto { Id = 1, BrandId = 1, CategoryId = 4, Description = "Poor quality fake faux leather cover loose enough to fit any mobile device.", Name = "Wrap It and Hope Cover", Price = 10.25, StockLevel = 1 }
+        };
 
             var controller = new ProductsController(new FakeProductsService(), new OrdersService());
 
             // Act (making order)
-            var result = await controller.PurchaseProduct(product.Id, order);
+            var result = await controller.PurchaseProduct(order);
 
             // Act (getting product to check stock)
-            var result2 = await controller.GetProduct(product.Id);
+            var result2 = await controller.GetProduct(order.Product.Id);
 
             // Assert (for making order)
             Assert.IsNotNull(result);
@@ -280,25 +279,24 @@ namespace ThAmCo.Products.Tests
             var productResult = objResult2.Value as ProductDto;
             Assert.IsNotNull(productResult);
             Assert.AreEqual(orderResult.Product.Id, order.Product.Id);
-            Assert.AreNotEqual(productResult.StockLevel, product.StockLevel);
-            Assert.AreEqual(productResult.StockLevel, (product.StockLevel - 1));
+            Assert.AreNotEqual(productResult.StockLevel, order.Product.StockLevel);
+            Assert.AreEqual(productResult.StockLevel, (order.Product.StockLevel - 1));
         }
 
         [TestMethod]
         public async Task PurchaseProduct_WithInvalidProduct_ShouldNotFound()
         {
             // Arrange
-            ProductDto product = new ProductDto { Id = 9999, BrandId = 1, CategoryId = 4, Description = "Poor quality fake faux leather cover loose enough to fit any mobile device.", Name = "Wrap It and Hope Cover", Price = 10.25, StockLevel = 1 };
             OrderDto order = new OrderDto
             {
                 Customer = new CustomerDto(),
-                Product = product
+                Product = new ProductDto { Id = 9999, BrandId = 1, CategoryId = 4, Description = "Poor quality fake faux leather cover loose enough to fit any mobile device.", Name = "Wrap It and Hope Cover", Price = 10.25, StockLevel = 1 }
             };
 
             var controller = new ProductsController(new FakeProductsService(), new OrdersService());
 
             // Act (making order)
-            var result = await controller.PurchaseProduct(product.Id, order);
+            var result = await controller.PurchaseProduct(order);
 
             // Assert
             Assert.IsNotNull(result);
@@ -310,21 +308,62 @@ namespace ThAmCo.Products.Tests
         public async Task PurchaseProduct_WithNoStock_ShouldBadRequest()
         {
             // Arrange
-            ProductDto product = new ProductDto { Id = 12, BrandId = 4, CategoryId = 1, Description = "Guaranteed not to conduct electical charge from your fingers.", Name = "Non-conductive Screen Protector", Price = 99.25, StockLevel = 0 };
             OrderDto order = new OrderDto
             {
                 Customer = new CustomerDto(),
-                Product = product
+                Product = new ProductDto { Id = 12, BrandId = 4, CategoryId = 1, Description = "Guaranteed not to conduct electical charge from your fingers.", Name = "Non-conductive Screen Protector", Price = 99.25, StockLevel = 0 }
             };
 
             var controller = new ProductsController(new FakeProductsService(), new OrdersService());
 
             // Act (making order)
-            var result = await controller.PurchaseProduct(product.Id, order);
+            var result = await controller.PurchaseProduct(order);
 
             // Assert
             Assert.IsNotNull(result);
             var objResult = result as BadRequestResult;
+            Assert.IsNotNull(objResult);
+        }
+
+        [TestMethod]
+        public void PurchaseProduct_ModelValidate_ShouldBeFalse()
+        {
+            // Arrange
+            var validationResultList = new List<ValidationResult>();
+            ProductDto product = new ProductDto { Id = 12, BrandId = 4, CategoryId = 1, Description = "Guaranteed not to conduct electical charge from your fingers.", Name = "Non-conductive Screen Protector", Price = 99.25, StockLevel = 0 };
+            OrderDto order = new OrderDto
+            {
+                Product = product
+            };
+
+            // Act
+            var result = Validator.TryValidateObject(order, new ValidationContext(order), validationResultList, true);
+
+            // Assert
+            Assert.IsFalse(result);
+            Assert.AreEqual(1, validationResultList.Count);
+            Assert.AreEqual("Customer", validationResultList[0].MemberNames.ElementAt(0));
+            Assert.AreEqual("The Customer field is required.", validationResultList[0].ErrorMessage);
+        }
+
+        [TestMethod]
+        public async Task PurchaseProduct_WithInvalidModelState_ShouldBadRequest()
+        {
+            // Arrange
+            var controller = new ProductsController(new FakeProductsService(), new OrdersService());
+            controller.ModelState.AddModelError("test", "test");
+            ProductDto product = new ProductDto { Id = 12, BrandId = 4, CategoryId = 1, Description = "Guaranteed not to conduct electical charge from your fingers.", Name = "Non-conductive Screen Protector", Price = 99.25, StockLevel = 0 };
+            OrderDto order = new OrderDto
+            {
+                Product = product
+            };
+
+            // Act
+            var result = await controller.PurchaseProduct(order);
+
+            // Assert
+            Assert.IsNotNull(result);
+            var objResult = result as BadRequestObjectResult;
             Assert.IsNotNull(objResult);
         }
 
@@ -381,6 +420,48 @@ namespace ThAmCo.Products.Tests
             // Assert
             Assert.IsNotNull(result);
             var objResult = result as NotFoundResult;
+            Assert.IsNotNull(objResult);
+        }
+
+        [TestMethod]
+        public void UpdateProductStock_ModelValidate_ShouldBeFalse()
+        {
+            // Arrange
+            var validationResultList = new List<ValidationResult>();
+            StockDto stock = new StockDto
+            {
+                ProductId = 9999,
+                AdditionalStock = -1
+            };
+
+            // Act
+            var result = Validator.TryValidateObject(stock, new ValidationContext(stock), validationResultList, true);
+
+            // Assert
+            Assert.IsFalse(result);
+            Assert.AreEqual(1, validationResultList.Count);
+            Assert.AreEqual("AdditionalStock", validationResultList[0].MemberNames.ElementAt(0));
+            Assert.AreEqual("The field AdditionalStock must be between 1 and 2147483647.", validationResultList[0].ErrorMessage);
+        }
+
+        [TestMethod]
+        public async Task UpdateProductStock_WithInvalidModelState_ShouldBadRequest()
+        {
+            // Arrange
+            var controller = new ProductsController(new FakeProductsService(), new OrdersService());
+            controller.ModelState.AddModelError("test", "test");
+            StockDto stock = new StockDto
+            {
+                ProductId = 9999,
+                AdditionalStock = -1
+            };
+
+            // Act
+            var result = await controller.UpdateStock(stock);
+
+            // Assert
+            Assert.IsNotNull(result);
+            var objResult = result as BadRequestObjectResult;
             Assert.IsNotNull(objResult);
         }
     }
