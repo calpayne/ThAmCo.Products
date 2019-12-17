@@ -55,7 +55,15 @@ namespace ThAmCo.Products.Web
                     .AddTransientHttpErrorPolicy(p =>
                         p.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)));
 
-            services.AddTransient<IOrdersService, OrdersService>();
+            services.AddHttpClient<IOrdersService, OrdersService>(c =>
+            {
+                c.BaseAddress = new System.Uri(Configuration["OrderApi"]);
+                c.DefaultRequestHeaders.Accept.ParseAdd("application/json");
+            })
+                    .AddTransientHttpErrorPolicy(p =>
+                        p.WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))))
+                    .AddTransientHttpErrorPolicy(p =>
+                        p.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)));
 
             services.AddHttpClient<IBrandsService, BrandsService>(c => 
                     {

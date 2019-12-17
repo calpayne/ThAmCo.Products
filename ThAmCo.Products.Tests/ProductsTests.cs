@@ -36,7 +36,7 @@ namespace ThAmCo.Products.Tests
                 new ProductDto { Id = 12, BrandId = 4, CategoryId = 1, Description = "Guaranteed not to conduct electical charge from your fingers.", Name = "Non-conductive Screen Protector", Price = 99.25, StockLevel = 0 }
             };
 
-            var controller = new ProductsController(new FakeProductsService(), new OrdersService());
+            var controller = new ProductsController(new FakeProductsService(), new FakeOrdersService());
 
             // Act
             var result = await controller.GetProducts();
@@ -76,7 +76,7 @@ namespace ThAmCo.Products.Tests
                 new ProductDto { Id = 10, BrandId = 2, CategoryId = 3, Description = "For his or her sensory pleasure. Fits few known smartphones.", Name = "Rippled Screen Protector", Price = 85.25, StockLevel = 5 }
             };
 
-            var controller = new ProductsController(new FakeProductsService(), new OrdersService());
+            var controller = new ProductsController(new FakeProductsService(), new FakeOrdersService());
 
             // Act
             int[] brands = { 1, 2 };
@@ -109,7 +109,7 @@ namespace ThAmCo.Products.Tests
         public async Task GetAllProducts_WithNoResultsSearch_ShouldNoContent()
         {
             // Arrange
-            var controller = new ProductsController(new FakeProductsService(), new OrdersService());
+            var controller = new ProductsController(new FakeProductsService(), new FakeOrdersService());
 
             // Act
             int[] brands = { 20 };
@@ -129,7 +129,7 @@ namespace ThAmCo.Products.Tests
             // Arrange
             ProductDto fakeProduct = new ProductDto { Id = 1, BrandId = 1, CategoryId = 4, Description = "Poor quality fake faux leather cover loose enough to fit any mobile device.", Name = "Wrap It and Hope Cover", Price = 10.25, StockLevel = 1 };
 
-            var controller = new ProductsController(new FakeProductsService(), new OrdersService());
+            var controller = new ProductsController(new FakeProductsService(), new FakeOrdersService());
 
             // Act
             var result = await controller.GetProduct(1);
@@ -153,7 +153,7 @@ namespace ThAmCo.Products.Tests
         public async Task GetProduct_WithInvalidID_ShouldNotFound()
         {
             // Arrange
-            var controller = new ProductsController(new FakeProductsService(), new OrdersService());
+            var controller = new ProductsController(new FakeProductsService(), new FakeOrdersService());
 
             // Act
             var result = await controller.GetProduct(99999);
@@ -178,7 +178,7 @@ namespace ThAmCo.Products.Tests
                 new PriceHistoryDto { Id = 6, Price = 20.25, CreatedDate = new DateTime(2019, 1, 23) }
             };
 
-            var controller = new ProductsController(new FakeProductsService(), new OrdersService());
+            var controller = new ProductsController(new FakeProductsService(), new FakeOrdersService());
 
             // Act
             var result = await controller.GetPriceHistory(1);
@@ -207,7 +207,7 @@ namespace ThAmCo.Products.Tests
         public async Task GetPriceHistory_WithInvalidProduct_ShouldNotFound()
         {
             // Arrange
-            var controller = new ProductsController(new FakeProductsService(), new OrdersService());
+            var controller = new ProductsController(new FakeProductsService(), new FakeOrdersService());
 
             // Act
             var result = await controller.GetPriceHistory(99999);
@@ -222,7 +222,7 @@ namespace ThAmCo.Products.Tests
         public async Task UpdatePriceHistory_WithValidProduct_ShouldOkObject()
         {
             // Arrange
-            var controller = new ProductsController(new FakeProductsService(), new OrdersService());
+            var controller = new ProductsController(new FakeProductsService(), new FakeOrdersService());
             PriceDto price = new PriceDto
             {
                 ProductId = 1,
@@ -267,7 +267,7 @@ namespace ThAmCo.Products.Tests
         public async Task UpdatePriceHistory_WithInvalidModelState_ShouldBadRequest()
         {
             // Arrange
-            var controller = new ProductsController(new FakeProductsService(), new OrdersService());
+            var controller = new ProductsController(new FakeProductsService(), new FakeOrdersService());
             controller.ModelState.AddModelError("test", "test");
             PriceDto price = new PriceDto
             {
@@ -288,7 +288,7 @@ namespace ThAmCo.Products.Tests
         public async Task UpdatePriceHistory_WithInvalidProduct_ShouldNotFound()
         {
             // Arrange
-            var controller = new ProductsController(new FakeProductsService(), new OrdersService());
+            var controller = new ProductsController(new FakeProductsService(), new FakeOrdersService());
             PriceDto price = new PriceDto
             {
                 ProductId = 9999,
@@ -314,7 +314,7 @@ namespace ThAmCo.Products.Tests
                 Product = new ProductDto { Id = 1, BrandId = 1, CategoryId = 4, Description = "Poor quality fake faux leather cover loose enough to fit any mobile device.", Name = "Wrap It and Hope Cover", Price = 10.25, StockLevel = 1 }
         };
 
-            var controller = new ProductsController(new FakeProductsService(), new OrdersService());
+            var controller = new ProductsController(new FakeProductsService(), new FakeOrdersService());
 
             // Act (making order)
             var result = await controller.PurchaseProduct(order);
@@ -351,7 +351,7 @@ namespace ThAmCo.Products.Tests
                 Product = new ProductDto { Id = 9999, BrandId = 1, CategoryId = 4, Description = "Poor quality fake faux leather cover loose enough to fit any mobile device.", Name = "Wrap It and Hope Cover", Price = 10.25, StockLevel = 1 }
             };
 
-            var controller = new ProductsController(new FakeProductsService(), new OrdersService());
+            var controller = new ProductsController(new FakeProductsService(), new FakeOrdersService());
 
             // Act (making order)
             var result = await controller.PurchaseProduct(order);
@@ -372,7 +372,7 @@ namespace ThAmCo.Products.Tests
                 Product = new ProductDto { Id = 12, BrandId = 4, CategoryId = 1, Description = "Guaranteed not to conduct electical charge from your fingers.", Name = "Non-conductive Screen Protector", Price = 99.25, StockLevel = 0 }
             };
 
-            var controller = new ProductsController(new FakeProductsService(), new OrdersService());
+            var controller = new ProductsController(new FakeProductsService(), new FakeOrdersService());
 
             // Act (making order)
             var result = await controller.PurchaseProduct(order);
@@ -408,7 +408,7 @@ namespace ThAmCo.Products.Tests
         public async Task PurchaseProduct_WithInvalidModelState_ShouldBadRequest()
         {
             // Arrange
-            var controller = new ProductsController(new FakeProductsService(), new OrdersService());
+            var controller = new ProductsController(new FakeProductsService(), new FakeOrdersService());
             controller.ModelState.AddModelError("test", "test");
             ProductDto product = new ProductDto { Id = 12, BrandId = 4, CategoryId = 1, Description = "Guaranteed not to conduct electical charge from your fingers.", Name = "Non-conductive Screen Protector", Price = 99.25, StockLevel = 0 };
             OrderDto order = new OrderDto
@@ -436,7 +436,7 @@ namespace ThAmCo.Products.Tests
                 AdditionalStock = 10
             };
 
-            var controller = new ProductsController(new FakeProductsService(), new OrdersService());
+            var controller = new ProductsController(new FakeProductsService(), new FakeOrdersService());
 
             // Act
             var result = await controller.UpdateStock(stock);
@@ -470,7 +470,7 @@ namespace ThAmCo.Products.Tests
                 AdditionalStock = 10
             };
 
-            var controller = new ProductsController(new FakeProductsService(), new OrdersService());
+            var controller = new ProductsController(new FakeProductsService(), new FakeOrdersService());
 
             // Act (making order)
             var result = await controller.UpdateStock(stock);
@@ -506,7 +506,7 @@ namespace ThAmCo.Products.Tests
         public async Task UpdateProductStock_WithInvalidModelState_ShouldBadRequest()
         {
             // Arrange
-            var controller = new ProductsController(new FakeProductsService(), new OrdersService());
+            var controller = new ProductsController(new FakeProductsService(), new FakeOrdersService());
             controller.ModelState.AddModelError("test", "test");
             StockDto stock = new StockDto
             {
