@@ -312,7 +312,7 @@ namespace ThAmCo.Products.Tests
             {
                 Customer = new CustomerDto(),
                 Product = new ProductDto { Id = 1, BrandId = 1, CategoryId = 4, Description = "Poor quality fake faux leather cover loose enough to fit any mobile device.", Name = "Wrap It and Hope Cover", Price = 10.25, StockLevel = 1 }
-        };
+            };
 
             var controller = new ProductsController(new FakeProductsService(), new FakeOrdersService());
 
