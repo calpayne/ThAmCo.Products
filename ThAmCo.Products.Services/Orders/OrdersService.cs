@@ -21,14 +21,16 @@ namespace ThAmCo.Products.Services.Orders
 
             try
             {
-                HttpResponseMessage response = await _client.PostAsJsonAsync("/api/purchase/", order);
+                HttpResponseMessage response = await _client.PostAsJsonAsync("/api/orders/purchase/", order);
                 if (response.StatusCode == HttpStatusCode.NotFound)
                 {
                     return false;
                 }
                 response.EnsureSuccessStatusCode();
 
-                has = await response.Content.ReadAsAsync<bool>();
+                OrderDto data = await response.Content.ReadAsAsync<OrderDto>();
+
+                has = data != null && data.Product.Id == order.Product.Id && data.Customer.Id == order.Customer.Id;
             }
             catch (HttpRequestException)
             {
