@@ -78,7 +78,7 @@ namespace ThAmCo.Products.Services.Products
         {
             IEnumerable<ProductDto> products = await GetAllProducts();
 
-            return products.OrderByDescending(p => p.StockLevel);
+            return products.OrderBy(p => p.StockLevel);
         }
 
         public async Task<ProductDto> GetByIDAsync(int id)

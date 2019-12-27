@@ -53,7 +53,7 @@ namespace ThAmCo.Products.Services.Products
 
         public Task<IEnumerable<ProductDto>> GetAllByStockAsync()
         {
-            return Task.FromResult(_products.OrderByDescending(p => p.StockLevel).AsEnumerable());
+            return Task.FromResult(_products.OrderBy(p => p.StockLevel).AsEnumerable());
         }
 
         public Task<ProductDto> GetByIDAsync(int id)
