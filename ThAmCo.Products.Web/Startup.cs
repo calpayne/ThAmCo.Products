@@ -88,7 +88,7 @@ namespace ThAmCo.Products.Web
             {
                 services.AddHttpClient<IBrandsService, BrandsService>(c =>
                         {
-                            c.BaseAddress = new System.Uri(Configuration.GetConnectionString("UnderCutters"));
+                            c.BaseAddress = new System.Uri(Configuration["ProductsApi"]);
                             c.DefaultRequestHeaders.Accept.ParseAdd("application/json");
                         })
                         .AddTransientHttpErrorPolicy(p =>
@@ -98,7 +98,7 @@ namespace ThAmCo.Products.Web
 
                 services.AddHttpClient<ICategoriesService, CategoriesService>(c =>
                         {
-                            c.BaseAddress = new System.Uri(Configuration.GetConnectionString("UnderCutters"));
+                            c.BaseAddress = new System.Uri(Configuration["ProductsApi"]);
                             c.DefaultRequestHeaders.Accept.ParseAdd("application/json");
                         })
                         .AddTransientHttpErrorPolicy(p =>

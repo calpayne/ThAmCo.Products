@@ -14,9 +14,6 @@ namespace ThAmCo.Products.Services.Categories
 
         public CategoriesService(IConfiguration config, HttpClient client)
         {
-            client.BaseAddress = new System.Uri(config.GetConnectionString("UnderCutters"));
-            client.Timeout = TimeSpan.FromSeconds(5);
-            client.DefaultRequestHeaders.Accept.ParseAdd("application/json");
             _client = client;
         }
 
