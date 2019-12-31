@@ -83,7 +83,7 @@ namespace ThAmCo.Products.Web.Controllers
         }
 
         // POST: api/Products/Purchase/
-        [HttpPost("purchase/")]
+        [Route("purchase/"), HttpPost]
         public async Task<IActionResult> PurchaseProduct(OrderDto order)
         {
             if (!ModelState.IsValid)

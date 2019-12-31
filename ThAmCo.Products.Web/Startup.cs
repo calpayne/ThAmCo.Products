@@ -45,45 +45,67 @@ namespace ThAmCo.Products.Web
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
-            services.AddHttpClient<IProductsService, ProductsService>(c =>
-                    {
-                        c.BaseAddress = new System.Uri(Configuration.GetConnectionString("UnderCutters"));
-                        c.DefaultRequestHeaders.Accept.ParseAdd("application/json");
-                    })
-                    .AddTransientHttpErrorPolicy(p =>
-                        p.WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))))
-                    .AddTransientHttpErrorPolicy(p =>
-                        p.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)));
-
-            services.AddHttpClient<IOrdersService, OrdersService>(c =>
+            if (Configuration["UseFakeProducts"] == "true")
             {
-                c.BaseAddress = new System.Uri(Configuration["OrderApi"]);
-                c.DefaultRequestHeaders.Accept.ParseAdd("application/json");
-            })
-                    .AddTransientHttpErrorPolicy(p =>
-                        p.WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))))
-                    .AddTransientHttpErrorPolicy(p =>
-                        p.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)));
+                services.AddTransient<IProductsService, FakeProductsService>();
+            }
+            else
+            {
+                services.AddHttpClient<IProductsService, ProductsService>(c =>
+                        {
+                            c.BaseAddress = new System.Uri(Configuration["ProductsApi"]);
+                            c.DefaultRequestHeaders.Accept.ParseAdd("application/json");
+                        })
+                        .AddTransientHttpErrorPolicy(p =>
+                            p.WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))))
+                        .AddTransientHttpErrorPolicy(p =>
+                            p.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)));
+            }
 
-            services.AddHttpClient<IBrandsService, BrandsService>(c => 
-                    {
-                        c.BaseAddress = new System.Uri(Configuration.GetConnectionString("UnderCutters"));
-                        c.DefaultRequestHeaders.Accept.ParseAdd("application/json");
-                    })
-                    .AddTransientHttpErrorPolicy(p => 
-                        p.WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))))
-                    .AddTransientHttpErrorPolicy(p => 
-                        p.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)));
+            if (Configuration["UseFakeOrders"] == "true")
+            {
+                services.AddTransient<IOrdersService, FakeOrdersService>();
+            }
+            else
+            {
+                services.AddHttpClient<IOrdersService, OrdersService>(c =>
+                        {
+                            c.BaseAddress = new System.Uri(Configuration["OrderApi"]);
+                            c.DefaultRequestHeaders.Accept.ParseAdd("application/json");
+                        })
+                        .AddTransientHttpErrorPolicy(p =>
+                            p.WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))))
+                        .AddTransientHttpErrorPolicy(p =>
+                            p.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)));
+            }
 
-            services.AddHttpClient<ICategoriesService, CategoriesService>(c =>
-                    {
-                        c.BaseAddress = new System.Uri(Configuration.GetConnectionString("UnderCutters"));
-                        c.DefaultRequestHeaders.Accept.ParseAdd("application/json");
-                    })
-                    .AddTransientHttpErrorPolicy(p =>
-                        p.WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))))
-                    .AddTransientHttpErrorPolicy(p =>
-                        p.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)));
+            if (Configuration["UseFakeBrandsCategories"] == "true")
+            {
+                services.AddTransient<IBrandsService, FakeBrandsService>();
+                services.AddTransient<ICategoriesService, FakeCategoriesService>();
+            }
+            else
+            {
+                services.AddHttpClient<IBrandsService, BrandsService>(c =>
+                        {
+                            c.BaseAddress = new System.Uri(Configuration.GetConnectionString("UnderCutters"));
+                            c.DefaultRequestHeaders.Accept.ParseAdd("application/json");
+                        })
+                        .AddTransientHttpErrorPolicy(p =>
+                            p.WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))))
+                        .AddTransientHttpErrorPolicy(p =>
+                            p.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)));
+
+                services.AddHttpClient<ICategoriesService, CategoriesService>(c =>
+                        {
+                            c.BaseAddress = new System.Uri(Configuration.GetConnectionString("UnderCutters"));
+                            c.DefaultRequestHeaders.Accept.ParseAdd("application/json");
+                        })
+                        .AddTransientHttpErrorPolicy(p =>
+                            p.WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))))
+                        .AddTransientHttpErrorPolicy(p =>
+                            p.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)));
+            }
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
