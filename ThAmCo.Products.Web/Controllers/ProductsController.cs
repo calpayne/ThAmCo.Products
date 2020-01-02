@@ -152,7 +152,7 @@ namespace ThAmCo.Products.Web.Controllers
         }
 
         // POST: api/Products/UpdateStock/
-        [HttpPost("api/products/updatestock/")]
+        [HttpPost("updatestock/")]
         public async Task<IActionResult> UpdateStock(StockDto stock)
         {
             if (!ModelState.IsValid)
