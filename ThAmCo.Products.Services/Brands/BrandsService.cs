@@ -22,15 +22,16 @@ namespace ThAmCo.Products.Services.Brands
         public async Task<IEnumerable<BrandDto>> GetAllAsync()
         {
             IEnumerable<BrandDto> brands;
-            HttpResponseMessage response = await _client.GetAsync("Brand");
-
-            if (response.StatusCode == HttpStatusCode.NotFound)
-            {
-                return null;
-            }
 
             try
             {
+                HttpResponseMessage response = await _client.GetAsync("Brand");
+
+                if (response.StatusCode == HttpStatusCode.NotFound)
+                {
+                    return null;
+                }
+
                 response.EnsureSuccessStatusCode();
                 brands = await response.Content.ReadAsAsync<IEnumerable<BrandDto>>();
             }
@@ -57,15 +58,16 @@ namespace ThAmCo.Products.Services.Brands
         public async Task<BrandDto> GetByIDAsync(int id)
         {
             BrandDto brand;
-            HttpResponseMessage response = await _client.GetAsync("Brand/" + id);
-
-            if (response.StatusCode == HttpStatusCode.NotFound)
-            {
-                return null;
-            }
 
             try
             {
+                HttpResponseMessage response = await _client.GetAsync("Brand/" + id);
+
+                if (response.StatusCode == HttpStatusCode.NotFound)
+                {
+                    return null;
+                }
+
                 response.EnsureSuccessStatusCode();
                 brand = await response.Content.ReadAsAsync<BrandDto>();
             }

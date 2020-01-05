@@ -27,33 +27,34 @@ namespace ThAmCo.Products.Services.Products
         private async Task<IEnumerable<ProductDto>> GetAllProducts()
         {
             IEnumerable<ProductDto> products;
-            HttpResponseMessage response = await _client.GetAsync("Product");
-
-            if (response.StatusCode == HttpStatusCode.NotFound)
-            {
-                return null;
-            }
 
             try
             {
+                HttpResponseMessage response = await _client.GetAsync("Product");
+
+                if (response.StatusCode == HttpStatusCode.NotFound)
+                {
+                    return null;
+                }
+
                 response.EnsureSuccessStatusCode();
                 products = await response.Content.ReadAsAsync<IEnumerable<ProductDto>>();
             }
             catch (SocketException)
             {
-                return null;
+                return Array.Empty<ProductDto>();
             }
             catch (BrokenCircuitException)
             {
-                return null;
+                return Array.Empty<ProductDto>();
             }
             catch (HttpRequestException)
             {
-                return null;
+                return Array.Empty<ProductDto>();
             }
             catch (UnsupportedMediaTypeException)
             {
-                return null;
+                return Array.Empty<ProductDto>();
             }
 
             foreach (ProductDto p in products)
@@ -94,15 +95,16 @@ namespace ThAmCo.Products.Services.Products
         public async Task<ProductDto> GetByIDAsync(int id)
         {
             ProductDto product;
-            HttpResponseMessage response = await _client.GetAsync("Product/" + id);
-
-            if (response.StatusCode == HttpStatusCode.NotFound)
-            {
-                return null;
-            }
 
             try
             {
+                HttpResponseMessage response = await _client.GetAsync("Product/" + id);
+
+                if (response.StatusCode == HttpStatusCode.NotFound)
+                {
+                    return null;
+                }
+
                 response.EnsureSuccessStatusCode();
                 product = await response.Content.ReadAsAsync<ProductDto>();
             }
