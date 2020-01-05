@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Polly.CircuitBreaker;
+using System;
 using System.Net;
 using System.Net.Http;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 using ThAmCo.Products.Models;
 
@@ -31,6 +33,14 @@ namespace ThAmCo.Products.Services.Orders
                 OrderDto data = await response.Content.ReadAsAsync<OrderDto>();
 
                 has = data != null && data.Product.Id == order.Product.Id && data.Customer.Id == order.Customer.Id;
+            }
+            catch (SocketException)
+            {
+                has = false;
+            }
+            catch (BrokenCircuitException)
+            {
+                has = false;
             }
             catch (HttpRequestException)
             {

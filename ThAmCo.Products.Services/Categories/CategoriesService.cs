@@ -1,8 +1,10 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Polly.CircuitBreaker;
 using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 using ThAmCo.Products.Models;
 
@@ -32,6 +34,14 @@ namespace ThAmCo.Products.Services.Categories
 
                 categories = await response.Content.ReadAsAsync<IEnumerable<CategoryDto>>();
             }
+            catch (SocketException)
+            {
+                categories = Array.Empty<CategoryDto>();
+            }
+            catch (BrokenCircuitException)
+            {
+                categories = Array.Empty<CategoryDto>();
+            }
             catch (HttpRequestException)
             {
                 categories = Array.Empty<CategoryDto>();
@@ -55,9 +65,17 @@ namespace ThAmCo.Products.Services.Categories
 
                 category = await response.Content.ReadAsAsync<CategoryDto>();
             }
+            catch (SocketException)
+            {
+                return null;
+            }
+            catch (BrokenCircuitException)
+            {
+                return null;
+            }
             catch (HttpRequestException)
             {
-                category = null;
+                return null;
             }
 
             return category;

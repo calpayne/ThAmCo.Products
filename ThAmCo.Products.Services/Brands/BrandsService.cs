@@ -1,8 +1,10 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Polly.CircuitBreaker;
 using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 using ThAmCo.Products.Models;
 
@@ -32,13 +34,21 @@ namespace ThAmCo.Products.Services.Brands
                 response.EnsureSuccessStatusCode();
                 brands = await response.Content.ReadAsAsync<IEnumerable<BrandDto>>();
             }
+            catch (SocketException)
+            {
+                brands = Array.Empty<BrandDto>();
+            }
+            catch (BrokenCircuitException)
+            {
+                brands = Array.Empty<BrandDto>();
+            }
             catch (HttpRequestException)
             {
-                return null;
+                brands = Array.Empty<BrandDto>();
             }
             catch (UnsupportedMediaTypeException)
             {
-                return null;
+                brands = Array.Empty<BrandDto>();
             }
 
             return brands;
@@ -58,6 +68,14 @@ namespace ThAmCo.Products.Services.Brands
             {
                 response.EnsureSuccessStatusCode();
                 brand = await response.Content.ReadAsAsync<BrandDto>();
+            }
+            catch (SocketException)
+            {
+                return null;
+            }
+            catch (BrokenCircuitException)
+            {
+                return null;
             }
             catch (HttpRequestException)
             {
