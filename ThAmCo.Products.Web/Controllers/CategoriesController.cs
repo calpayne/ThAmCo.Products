@@ -10,6 +10,7 @@ namespace ThAmCo.Products.Web.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class CategoriesController : ControllerBase
     {
         private readonly ICategoriesService _categories;

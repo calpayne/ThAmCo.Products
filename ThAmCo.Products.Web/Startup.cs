@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
@@ -37,6 +38,15 @@ namespace ThAmCo.Products.Web
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
+
+            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+
+            services.AddAuthentication("Bearer")
+                    .AddJwtBearer("Bearer", options =>
+                    {
+                        options.Authority = Configuration["AuthServer"];
+                        options.Audience = "thamco_products_api";
+                    });
 
             services.AddDbContext<StoreDb>(options => options.UseSqlServer(
                 Configuration.GetConnectionString("StoreConnection"), optionsBuilder =>
@@ -129,6 +139,8 @@ namespace ThAmCo.Products.Web
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
+
+            app.UseAuthentication();
 
             app.UseMvc(routes =>
             {
