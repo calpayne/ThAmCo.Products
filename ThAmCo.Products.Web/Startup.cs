@@ -38,8 +38,12 @@ namespace ThAmCo.Products.Web
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            services.AddDbContext<StoreDb>(options =>
-                        options.UseSqlServer(Configuration.GetConnectionString("StoreConnection")));
+            services.AddDbContext<StoreDb>(options => options.UseSqlServer(
+                Configuration.GetConnectionString("StoreConnection"), optionsBuilder =>
+                {
+                    optionsBuilder.EnableRetryOnFailure(3, TimeSpan.FromSeconds(10), null);
+                }
+            ));
             //services.BuildServiceProvider().GetService<StoreDb>().Database.EnsureDeleted();
             //services.BuildServiceProvider().GetService<StoreDb>().Database.Migrate();
 
