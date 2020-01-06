@@ -1,9 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using Moq.Protected;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using ThAmCo.Products.Models;
 using ThAmCo.Products.Services.Categories;
@@ -14,6 +19,28 @@ namespace ThAmCo.Products.Tests
     [TestClass]
     public class CategoriesTests
     {
+        private Mock<HttpMessageHandler> CreateHttpMock(HttpResponseMessage expected)
+        {
+            var mock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            mock.Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(expected)
+                .Verifiable();
+
+            return mock;
+        }
+
+        private CategoriesService CreateMoqCategories(Mock<HttpMessageHandler> mock)
+        {
+            var client = new HttpClient(mock.Object);
+            client.BaseAddress = new System.Uri("https://localhost:44353/");
+            var service = new CategoriesService(client);
+            return service;
+        }
+
         [TestMethod]
         public async Task GetAllCategories_ShouldOkObject()
         {
@@ -27,6 +54,53 @@ namespace ThAmCo.Products.Tests
             };
 
             var controller = new CategoriesController(new FakeCategoriesService());
+
+            // Act
+            var result = await controller.GetCategories();
+
+            // Assert
+            Assert.IsNotNull(result);
+            var objResult = result as OkObjectResult;
+            Assert.IsNotNull(objResult);
+            var categoriesResult = objResult.Value as IEnumerable<CategoryDto>;
+            Assert.IsNotNull(categoriesResult);
+            var categories = categoriesResult.ToList();
+            Assert.AreEqual(fakeCategories.Count(), categories.Count());
+
+            for (int i = 1; i <= categories.Count(); i++)
+            {
+                var real = categories.FirstOrDefault(p => p.Id == i);
+                var fake = fakeCategories.FirstOrDefault(p => p.Id == i);
+
+                Assert.AreEqual(fake.Id, real.Id);
+                Assert.AreEqual(fake.Name, real.Name);
+                Assert.AreEqual(fake.Description, real.Description);
+            }
+        }
+
+        [TestMethod]
+        public async Task GetAllCategories_Moq_ShouldOkObject()
+        {
+            // Arrange
+            IEnumerable<CategoryDto> fakeCategories = new List<CategoryDto>
+            {
+                new CategoryDto { Id = 1, Name = "Covers", Description = "Davison Stores pride ourselves on our poor range of covers for your mobile device at premium prices.  If you're lukcy your phone or tablet will be protected from any dents, scratches and scuffs." },
+                new CategoryDto { Id = 2, Name = "Case", Description = "Browse our wide range of cases for phones and tablets that will help you to keep your mobile device protected from the elements." },
+                new CategoryDto { Id = 3, Name = "Accessories", Description = "We stock a small range of phone and tablet accessories, including car holders, sports armbands, stylus pens and very little else." },
+                new CategoryDto { Id = 4, Name = "Screen Protectors", Description = "Exclusive Davison Stores screen protectors for your phone or tablet." }
+            };
+
+            var expectedJson = JsonConvert.SerializeObject(fakeCategories);
+            var expectedUri = new Uri("https://localhost:44353/");
+            var expectedResponse = new HttpResponseMessage
+            {
+                StatusCode = System.Net.HttpStatusCode.OK,
+                Content = new StringContent(expectedJson, Encoding.UTF8, "application/json")
+            };
+
+            var mock = CreateHttpMock(expectedResponse);
+
+            var controller = new CategoriesController(CreateMoqCategories(mock));
 
             // Act
             var result = await controller.GetCategories();
@@ -74,10 +148,67 @@ namespace ThAmCo.Products.Tests
         }
 
         [TestMethod]
+        public async Task GetCategory_WithValidID_Moq_ShouldOkObject()
+        {
+            // Arrange
+            CategoryDto fakeCategory = new CategoryDto { Id = 1, Name = "Covers", Description = "Davison Stores pride ourselves on our poor range of covers for your mobile device at premium prices.  If you're lukcy your phone or tablet will be protected from any dents, scratches and scuffs." };
+
+            var expectedJson = JsonConvert.SerializeObject(fakeCategory);
+            var expectedUri = new Uri("https://localhost:44353/");
+            var expectedResponse = new HttpResponseMessage
+            {
+                StatusCode = System.Net.HttpStatusCode.OK,
+                Content = new StringContent(expectedJson, Encoding.UTF8, "application/json")
+            };
+
+            var mock = CreateHttpMock(expectedResponse);
+
+            var controller = new CategoriesController(CreateMoqCategories(mock));
+
+            // Act
+            var result = await controller.GetCategory(1);
+
+            // Assert
+            Assert.IsNotNull(result);
+            var objResult = result as OkObjectResult;
+            Assert.IsNotNull(objResult);
+            var categoryResult = objResult.Value as CategoryDto;
+            Assert.IsNotNull(categoryResult);
+            Assert.AreEqual(fakeCategory.Id, categoryResult.Id);
+            Assert.AreEqual(fakeCategory.Name, categoryResult.Name);
+            Assert.AreEqual(fakeCategory.Description, categoryResult.Description);
+        }
+
+        [TestMethod]
         public async Task GetCategory_WithInvalidID_ShouldNotFound()
         {
             // Arrange
             var controller = new CategoriesController(new FakeCategoriesService());
+
+            // Act
+            var result = await controller.GetCategory(99999);
+
+            // Assert
+            Assert.IsNotNull(result);
+            var objResult = result as NotFoundResult;
+            Assert.IsNotNull(objResult);
+        }
+
+        [TestMethod]
+        public async Task GetCategory_WithInvalidID_Moq_ShouldNotFound()
+        {
+            // Arrange
+            var expectedJson = JsonConvert.SerializeObject(null);
+            var expectedUri = new Uri("https://localhost:44353/");
+            var expectedResponse = new HttpResponseMessage
+            {
+                StatusCode = System.Net.HttpStatusCode.OK,
+                Content = new StringContent(expectedJson, Encoding.UTF8, "application/json")
+            };
+
+            var mock = CreateHttpMock(expectedResponse);
+
+            var controller = new CategoriesController(CreateMoqCategories(mock));
 
             // Act
             var result = await controller.GetCategory(99999);

@@ -14,7 +14,7 @@ namespace ThAmCo.Products.Services.Categories
     {
         private readonly HttpClient _client;
 
-        public CategoriesService(IConfiguration config, HttpClient client)
+        public CategoriesService(HttpClient client)
         {
             _client = client;
         }
